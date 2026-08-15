@@ -7,7 +7,10 @@ COPY ./shared/tsconfig.json ./shared/
 COPY ./frontend ./frontend
 COPY ./shared ./shared
 WORKDIR /app/frontend
-RUN npm run build
+# --force : reconstruit toujours le projet partagé (shared), même si un
+# .tsbuildinfo obsolète (chemins absolus de la machine de dev) a été copié
+# (npx pour tsc ET vite : les binaires ne sont pas sur le PATH de sh dans l'image)
+RUN npx tsc -b --force && npx vite build
 
 FROM node:20-slim AS runner
 WORKDIR /app

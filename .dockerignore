@@ -10,6 +10,7 @@ frontend/dist
 shared/dist
 build
 coverage
+*.tsbuildinfo
 
 # HTTPS private keys (do not bake into image layers; mount as a volume)
 frontend/certs/
