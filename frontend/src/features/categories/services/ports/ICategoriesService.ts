@@ -8,6 +8,12 @@ export interface ILanguagePair {
 export interface ICategoriesService {
     getAll(): Promise<IFlashcardCategory[]>;
     getById(id: string): Promise<IFlashcardCategory | undefined>;
-    createFromPrompt(prompt: string, languagePair: ILanguagePair, onProgress?: (stage: string) => void): Promise<IFlashcardCategory>;
+    incrementSessionCount(categoryId: string): Promise<void>;
+    createFromPrompt(
+        prompt: string,
+        languagePair: ILanguagePair,
+        onProgress?: (stage: string) => void,
+        itemCount?: number
+    ): Promise<IFlashcardCategory>;
     delete(id: string): Promise<void>;
 }

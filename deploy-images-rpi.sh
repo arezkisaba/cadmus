@@ -2,7 +2,6 @@
 
 DOCKER_REPO="arezkisaba/main"
 IMAGE_BASE_NAME="cadmus"
-BACKEND_NAME="${IMAGE_BASE_NAME}-backend"
 FRONTEND_NAME="${IMAGE_BASE_NAME}-frontend"
 LOCAL_OVPN_PATH="/etc/openvpn/main.conf"
 LOCAL_OVPN_AUTH_PATH="/etc/openvpn/auth.txt"
@@ -10,15 +9,13 @@ LOCAL_OVPN_AUTH_PATH="/etc/openvpn/auth.txt"
 clean_dependencies() {
     echo "🧹 Cleaning node_modules and dist folders..."
     rm -rf node_modules dist
-    rm -rf backend/.config
-    rm -rf backend/node_modules backend/dist
     rm -rf frontend/node_modules frontend/dist
     echo "✅ Cleanup complete"
 }
 
 init_compose_file() {
-    sed "s|{{DOCKER_REPO}}|$DOCKER_REPO|g; s|{{BACKEND_NAME}}|$BACKEND_NAME|g; s|{{FRONTEND_NAME}}|$FRONTEND_NAME|g" docker-compose.build.yml.template >docker-compose.build.yml
-    sed "s|{{DOCKER_REPO}}|$DOCKER_REPO|g; s|{{BACKEND_NAME}}|$BACKEND_NAME|g; s|{{FRONTEND_NAME}}|$FRONTEND_NAME|g" docker-compose.prod.yml.template >docker-compose.prod.yml
+    sed "s|{{DOCKER_REPO}}|$DOCKER_REPO|g; s|{{FRONTEND_NAME}}|$FRONTEND_NAME|g" docker-compose.build.yml.template >docker-compose.build.yml
+    sed "s|{{DOCKER_REPO}}|$DOCKER_REPO|g; s|{{FRONTEND_NAME}}|$FRONTEND_NAME|g" docker-compose.prod.yml.template >docker-compose.prod.yml
 }
 
 stop_services() {
@@ -52,9 +49,6 @@ configure_openvpn() {
 
 configure_docker() {
     echo "🧹 Cleaning up old images..."
-    if docker image inspect "$DOCKER_REPO:$BACKEND_NAME" >/dev/null 2>&1; then
-        sudo docker rmi -f "$DOCKER_REPO:$BACKEND_NAME"
-    fi
     if docker image inspect "$DOCKER_REPO:$FRONTEND_NAME" >/dev/null 2>&1; then
         sudo docker rmi -f "$DOCKER_REPO:$FRONTEND_NAME"
     fi

@@ -20,7 +20,11 @@ export class AiGenerationService implements IAiGenerationService {
         let lastError: unknown = null;
         for (const provider of available) {
             try {
-                return await provider.generateCategory(request);
+                const response = await provider.generateCategory(request);
+                if (request.itemCount !== undefined) {
+                    return { ...response, items: response.items.slice(0, request.itemCount) };
+                }
+                return response;
             } catch (error) {
                 lastError = error;
             }

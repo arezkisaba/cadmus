@@ -1,6 +1,6 @@
 import type { IFlashcard, IFlashcardCategory } from '@shared/models/FlashcardModels';
 import { ArrowLeft, CheckCircle2, PartyPopper, XCircle } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -25,6 +25,7 @@ export const FlashcardReviewPage: React.FC = () => {
     const [correctCount, setCorrectCount] = useState(0);
     const [wrongCount, setWrongCount] = useState(0);
     const [finished, setFinished] = useState(false);
+    const completedRef = useRef(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -32,15 +33,25 @@ export const FlashcardReviewPage: React.FC = () => {
             if (categoryId === undefined) {
                 return;
             }
+            const now = Date.now();
             const [loadedCategory, loadedCards] = await Promise.all([
                 categoriesService.getById(categoryId),
-                flashcardsService.getDueFlashcards(categoryId),
+                flashcardsService.getAllByCategory(categoryId),
             ]);
+            loadedCards.sort((a, b) => {
+                const aDue = a.nextReviewAt === null || a.nextReviewAt <= now ? 0 : 1;
+                const bDue = b.nextReviewAt === null || b.nextReviewAt <= now ? 0 : 1;
+                if (aDue !== bDue) {
+                    return aDue - bDue;
+                }
+                return (a.nextReviewAt ?? 0) - (b.nextReviewAt ?? 0);
+            });
             if (cancelled) {
                 return;
             }
             setCategory(loadedCategory);
             setDeck(loadedCards);
+            completedRef.current = false;
             setLoading(false);
         };
         load();
@@ -64,19 +75,28 @@ export const FlashcardReviewPage: React.FC = () => {
             if (current === undefined) {
                 return;
             }
-            await flashcardsService.answer(current, correct);
+            const updated = await flashcardsService.answer(current, correct);
+            setDeck((prev) => {
+                const next = [...prev];
+                next[index] = updated;
+                return next;
+            });
             if (correct) {
                 setCorrectCount((prev) => prev + 1);
             } else {
                 setWrongCount((prev) => prev + 1);
             }
             if (index + 1 >= deck.length) {
+                if (categoryId !== undefined && !completedRef.current) {
+                    completedRef.current = true;
+                    await categoriesService.incrementSessionCount(categoryId);
+                }
                 setFinished(true);
             } else {
                 setIndex((prev) => prev + 1);
             }
         },
-        [deck, index, flashcardsService]
+        [deck, index, flashcardsService, categoriesService, categoryId]
     );
 
     const handleBack = useCallback((): void => {
@@ -110,9 +130,9 @@ export const FlashcardReviewPage: React.FC = () => {
                 <div className="bg-primary/10 text-primary flex size-16 items-center justify-center rounded-full">
                     <CheckCircle2 className="size-8" />
                 </div>
-                <h2 className="text-xl font-semibold">All caught up!</h2>
+                <h2 className="text-xl font-semibold">No cards to review</h2>
                 <p className="text-muted-foreground max-w-sm text-sm">
-                    No flashcards are due for review in "{category.name}". Come back later or create a new category.
+                    This category has no flashcards yet. Create a new category to get started.
                 </p>
                 <Button onClick={handleBack}>
                     <ArrowLeft />

@@ -19,12 +19,15 @@ interface ICreateCategoryDialogProps {
 }
 
 const EXAMPLE_PROMPTS = ['les vêtements de tous les jours', 'la nourriture au restaurant', 'le vocabulaire du voyage', 'les objets de la maison'];
+const CARD_COUNT_OPTIONS = [10, 15, 20, 25, 30, 40, 50];
+const DEFAULT_CARD_COUNT = 20;
 
 export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ open, onOpenChange }) => {
     const categoriesService = useInjection<ICategoriesService>(DI_CONSTANTS.ICategoriesService);
     const settingsService = useInjection<ISettingsService>(DI_CONSTANTS.ISettingsService);
     const initialSettings = settingsService.getSettings();
     const [prompt, setPrompt] = useState('');
+    const [cardCount, setCardCount] = useState(DEFAULT_CARD_COUNT);
     const [sourceLang, setSourceLang] = useState(initialSettings.sourceLang);
     const [targetLang, setTargetLang] = useState(initialSettings.targetLang);
     const [loading, setLoading] = useState(false);
@@ -38,7 +41,7 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
         setLoading(true);
         setProgressText('Generating vocabulary with AI...');
         try {
-            await categoriesService.createFromPrompt(trimmed, { sourceLang, targetLang }, (stage) => setProgressText(stage));
+            await categoriesService.createFromPrompt(trimmed, { sourceLang, targetLang }, (stage) => setProgressText(stage), cardCount);
             toast.success('Category created');
             setPrompt('');
             onOpenChange(false);
@@ -48,7 +51,7 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
         } finally {
             setLoading(false);
         }
-    }, [prompt, sourceLang, targetLang, categoriesService, onOpenChange]);
+    }, [prompt, sourceLang, targetLang, cardCount, categoriesService, onOpenChange]);
 
     const handleOpenChange = useCallback(
         (next: boolean): void => {
@@ -101,6 +104,21 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
                                 ))}
                             </Select>
                         </div>
+                    </div>
+                    <div className="flex flex-col gap-2 sm:max-w-[14rem]">
+                        <Label htmlFor="dialog-card-count">Number of cards</Label>
+                        <Select
+                            id="dialog-card-count"
+                            value={String(cardCount)}
+                            onChange={(event) => setCardCount(Number(event.target.value))}
+                            disabled={loading}
+                        >
+                            {CARD_COUNT_OPTIONS.map((count) => (
+                                <option key={count} value={count}>
+                                    {count} cards
+                                </option>
+                            ))}
+                        </Select>
                     </div>
                     <Textarea
                         value={prompt}

@@ -23,7 +23,7 @@ export function buildCategoryMessages(request: IGenerateCategoryRequest): IAiMes
                     '", "backDefinition": "short definition in ' +
                     request.targetLang +
                     '"}]}',
-                'Provide between 20 and 40 items. Each item must include a short definition (one or two sentences) in both languages. Return only valid JSON without markdown.',
+                `Provide exactly ${request.itemCount ?? 20} items. Each item must include a short definition (one or two sentences) in both languages. Return only valid JSON without markdown.`,
             ].join(' '),
         },
         {

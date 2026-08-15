@@ -28,12 +28,30 @@ export class CategoriesService implements ICategoriesService {
         return this.databaseService.database.categories.get(id);
     }
 
-    public async createFromPrompt(prompt: string, languagePair: ILanguagePair, onProgress?: (stage: string) => void): Promise<IFlashcardCategory> {
+    public async incrementSessionCount(categoryId: string): Promise<void> {
+        const category = await this.databaseService.database.categories.get(categoryId);
+        if (category === undefined) {
+            return;
+        }
+        const updated: IFlashcardCategory = {
+            ...category,
+            sessionCount: (category.sessionCount ?? 0) + 1,
+        };
+        await this.databaseService.database.categories.put(updated);
+    }
+
+    public async createFromPrompt(
+        prompt: string,
+        languagePair: ILanguagePair,
+        onProgress?: (stage: string) => void,
+        itemCount?: number
+    ): Promise<IFlashcardCategory> {
         const settings = this.settingsService.getSettings();
         const request: IGenerateCategoryRequest = {
             prompt,
             sourceLang: languagePair.sourceLang,
             targetLang: languagePair.targetLang,
+            ...(itemCount !== undefined ? { itemCount } : {}),
         };
         onProgress?.('Generating vocabulary with AI...');
         const result = await this.aiGenerationService.generateCategory(request);
@@ -48,6 +66,7 @@ export class CategoriesService implements ICategoriesService {
             sourceLang: languagePair.sourceLang,
             targetLang: languagePair.targetLang,
             createdAt: now,
+            sessionCount: 0,
         };
 
         const useImages = settings.useImages;
@@ -83,6 +102,7 @@ export class CategoriesService implements ICategoriesService {
                 wrongCount: 0,
                 lastReviewedAt: null,
                 nextReviewAt: null,
+                lastResult: null,
             });
         }
 

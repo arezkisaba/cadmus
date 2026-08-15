@@ -20,6 +20,7 @@ export function computeAnswerResult(card: IFlashcard, correct: boolean, now: num
         correctCount: card.correctCount + (correct ? 1 : 0),
         wrongCount: card.wrongCount + (correct ? 0 : 1),
         lastReviewedAt: now,
+        lastResult: correct,
     };
 
     if (correct) {

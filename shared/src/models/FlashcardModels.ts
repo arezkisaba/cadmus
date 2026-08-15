@@ -6,6 +6,7 @@ export interface IFlashcardCategory {
     sourceLang: string;
     targetLang: string;
     createdAt: number;
+    sessionCount?: number;
 }
 
 export interface IFlashcard {
@@ -22,6 +23,7 @@ export interface IFlashcard {
     wrongCount: number;
     lastReviewedAt: number | null;
     nextReviewAt: number | null;
+    lastResult?: boolean | null;
 }
 
 export interface IAppSettings {
@@ -48,6 +50,7 @@ export interface IGenerateCategoryRequest {
     sourceLang: string;
     targetLang: string;
     categoryName?: string;
+    itemCount?: number;
 }
 
 export interface IGenerateCategoryResponse {

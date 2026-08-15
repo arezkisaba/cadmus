@@ -1,5 +1,5 @@
 import type { IFlashcardCategory } from '@shared/models/FlashcardModels';
-import { ArrowRight, Layers, Target, Trash2, TrendingUp } from 'lucide-react';
+import { ArrowRight, Layers, Repeat, Target, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,9 +16,9 @@ interface ICategoryCardProps {
 
 export const CategoryCard: React.FC<ICategoryCardProps> = ({ category, stats, onReview, onDelete }) => {
     const total = stats?.total ?? 0;
-    const due = stats?.due ?? 0;
     const mastered = stats?.mastered ?? 0;
     const accuracy = stats?.accuracy ?? null;
+    const sessions = category.sessionCount ?? 0;
     const masteryPct = total > 0 ? Math.round((mastered / total) * 100) : 0;
 
     return (
@@ -44,17 +44,15 @@ export const CategoryCard: React.FC<ICategoryCardProps> = ({ category, stats, on
             </CardHeader>
             <CardContent className="flex flex-1 flex-col gap-3 pb-4">
                 <p className="text-muted-foreground line-clamp-2 text-sm italic">"{category.prompt}"</p>
-                <div className="text-muted-foreground flex items-center gap-4 text-sm">
+                <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
                     <span className="flex items-center gap-1.5">
                         <Layers className="size-4" />
                         {total} cards
                     </span>
-                    {due > 0 && (
-                        <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                            <TrendingUp className="size-4" />
-                            {due} due
-                        </span>
-                    )}
+                    <span className="flex items-center gap-1.5">
+                        <Repeat className="size-4" />
+                        {sessions} sessions
+                    </span>
                     {accuracy !== null && (
                         <span className="flex items-center gap-1.5">
                             <Target className="size-4" />

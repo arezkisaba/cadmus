@@ -13,7 +13,7 @@ interface IFlashcardCardProps {
 }
 
 const CardStats: React.FC<{ card: IFlashcard }> = ({ card }) => (
-    <div className="text-muted-foreground mt-4 flex items-center justify-center gap-4 text-xs">
+    <div className="text-muted-foreground flex items-center justify-center gap-4 text-xs">
         <span className="flex items-center gap-1">
             <Check className="size-3.5 text-emerald-600 dark:text-emerald-400" />
             {card.correctCount}
@@ -51,6 +51,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
         <div className="flip-card mx-auto h-[30rem] w-full max-w-md select-none">
             <div className={`flip-card-inner relative h-full w-full ${flipped ? 'is-flipped' : ''}`}>
                 <div className="flip-card-face bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-6 shadow-lg">
+                    <CardStats card={card} />
                     <div className="flex flex-1 flex-col items-center justify-center gap-5">
                         <button
                             type="button"
@@ -80,11 +81,13 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                             </button>
                         </div>
                     </div>
-                    <CardStats card={card} />
-                    <span className="text-muted-foreground mt-3 text-center text-xs font-medium tracking-widest uppercase">Tap to reveal</span>
+                    <div className="mt-4 flex h-10 items-center justify-center">
+                        <span className="text-muted-foreground text-xs font-medium tracking-widest uppercase">Tap to reveal</span>
+                    </div>
                 </div>
 
                 <div className="flip-card-face flip-card-back bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-6 shadow-lg">
+                    <CardStats card={card} />
                     <div className="flex flex-1 flex-col items-center justify-center gap-5">
                         <button
                             type="button"
@@ -114,8 +117,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                             </button>
                         </div>
                     </div>
-                    <CardStats card={card} />
-                    <div className="mt-4 flex w-full gap-3">
+                    <div className="mt-4 flex h-10 w-full gap-3">
                         <Button
                             variant="outline"
                             className="hover:bg-red-500/10 flex-1 border-red-500/40 text-red-600"

@@ -2,7 +2,7 @@ import type { IFlashcard } from '@shared/models/FlashcardModels';
 import { inject, injectable } from 'tsyringe';
 import { DI_CONSTANTS } from '../../../di-constants';
 import type { DatabaseService } from '../../_shared/services/DatabaseService';
-import { computeAnswerResult, MASTERY_LEVEL } from './flashcard-scheduler';
+import { computeAnswerResult } from './flashcard-scheduler';
 import type { ICategoryStats, IFlashcardService } from './ports/IFlashcardService';
 
 @injectable()
@@ -47,7 +47,7 @@ export class FlashcardsService implements IFlashcardService {
             if (card.nextReviewAt === null || card.nextReviewAt <= now) {
                 due += 1;
             }
-            if (card.level >= MASTERY_LEVEL) {
+            if (card.lastResult === true) {
                 mastered += 1;
             }
             correctCount += card.correctCount;
@@ -64,9 +64,10 @@ export class FlashcardsService implements IFlashcardService {
         };
     }
 
-    public async answer(card: IFlashcard, correct: boolean): Promise<void> {
+    public async answer(card: IFlashcard, correct: boolean): Promise<IFlashcard> {
         const updated = computeAnswerResult(card, correct, Date.now());
         await this.databaseService.database.flashcards.put(updated);
+        return updated;
     }
 
     public async reset(card: IFlashcard): Promise<void> {
@@ -78,6 +79,7 @@ export class FlashcardsService implements IFlashcardService {
             wrongCount: 0,
             lastReviewedAt: null,
             nextReviewAt: null,
+            lastResult: null,
         };
         await this.databaseService.database.flashcards.put(updated);
     }
