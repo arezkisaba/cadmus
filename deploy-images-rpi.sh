@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 DOCKER_REPO="arezkisaba/main"
 IMAGE_BASE_NAME="cadmus"
@@ -20,9 +21,9 @@ init_compose_file() {
 
 stop_services() {
     echo "⏹️ Stopping existing services..."
-    sudo systemctl stop openvpn@main
-    sudo systemctl disable openvpn@main
-    sudo docker-compose -f docker-compose.prod.yml down
+    sudo systemctl stop openvpn@main || true
+    sudo systemctl disable openvpn@main || true
+    sudo docker-compose -f docker-compose.prod.yml down || true
 }
 
 configure_openvpn() {
@@ -55,13 +56,19 @@ configure_docker() {
 
     echo "🔨 Building images..."
     sudo docker-compose -f docker-compose.build.yml build --no-cache
+
+    echo "🔍 Checking image entrypoint..."
+    if ! sudo docker image inspect "$DOCKER_REPO:$FRONTEND_NAME" --format '{{json .Config.Cmd}}' | grep -q serve-https.mjs; then
+        echo "❌ L'image ne pointe pas vers serve-https.mjs. Déploiement annulé."
+        exit 1
+    fi
 }
 
 start_services() {
     echo "▶️ Starting services..."
-    sudo systemctl start openvpn@main
-    sudo systemctl enable openvpn@main
-    sudo -E docker-compose -f docker-compose.prod.yml up
+    sudo systemctl start openvpn@main || true
+    sudo systemctl enable openvpn@main || true
+    sudo -E docker-compose -f docker-compose.prod.yml up -d --force-recreate
 }
 
 clean_dependencies

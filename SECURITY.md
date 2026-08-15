@@ -135,3 +135,34 @@ npm run serve   # ou : npm run dev
 
 # 7) Après chaque installation de CA : redémarrer complètement le navigateur concerné
 ```
+
+## 8. Les fichiers de `frontend/certs/` et leur génération
+
+Le dossier `frontend/certs/` contient **3 fichiers** :
+
+| Fichier | Rôle | Confidentialité |
+|---|---|---|
+| `cadmus.crt` | **Certificat du site** (servi en HTTPS), signé par le CA mkcert | public |
+| `cadmus.key` | **Clé privée** associée au certificat | 🔒 secret, jamais partagé |
+| `rootCA.pem` | **Certificat public du CA** mkcert — c'est lui qu'on installe sur les navigateurs / l'iPhone | public (à distribuer) |
+
+### Comment ils sont générés
+
+**`cadmus.crt` + `cadmus.key`** — générés par `frontend/scripts/ensure-certs.mjs` :
+- préfère `mkcert` (signature par le CA local), sinon repli `openssl` auto-signé ;
+- couvre `localhost`, `127.0.0.1`, l'IP LAN détectée automatiquement + celles de `CADMUS_LAN_IP`.
+
+```bash
+CADMUS_LAN_IP="192.168.1.100,192.168.1.101" node frontend/scripts/ensure-certs.mjs
+```
+
+**`rootCA.pem`** — **copié manuellement** depuis le CA mkcert (il n'est pas généré par le script) :
+
+```bash
+cp "$(mkcert -CAROOT)/rootCA.pem" frontend/certs/rootCA.pem
+```
+
+> 💡 Si `cadmus.crt` / `cadmus.key` sont absents, `ensure-certs.mjs` les régénère automatiquement au
+> démarrage (dev et conteneur). `rootCA.pem`, lui, reste le même tant qu'on ne régénère pas le CA.
+> Dans le conteneur, ce dossier est monté via `./frontend/certs:/app/certs` (le chemin `/app/certs` est
+> calculé par le script à partir de son propre emplacement).
