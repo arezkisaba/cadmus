@@ -43,7 +43,7 @@ shared/src/
 └── models/                # Modèles partagés (IFlashcard, IFlashcardCategory...)
 ```
 
-# Serveur de développement (https://localhost:4445)
+# Serveur de développement (https://localhost:4446)
 
 ```bash
 # Prérequis: Node.js 20+ et openssl (pour le certificat local auto-signé)
@@ -51,7 +51,7 @@ shared/src/
 # Installer les dépendances frontend
 cd frontend && npm install
 
-# Serveur de développement en HTTPS (https://localhost:4445)
+# Serveur de développement en HTTPS (https://localhost:4446)
 # Le certificat auto-signé est généré automatiquement dans frontend/certs/ au premier lancement.
 npm run dev
 
@@ -82,7 +82,7 @@ Le build est entièrement statique (`frontend/dist`). Deux options :
 ```bash
 cd frontend && docker build -t cadmus ../ -f Dockerfile
 # Monter les certificats (recommandé, HTTPS approuvé) ; sinon génération d'un certificat auto-signé à l'intérieur du conteneur
-docker run -d -p 4445:4445 -v "$(pwd)/certs:/app/certs" cadmus
+docker run -d -p 4446:4446 -v "$(pwd)/certs:/app/certs" cadmus
 ```
 
 ### Option B — Serveur statique simple (HTTPS)
@@ -90,20 +90,23 @@ docker run -d -p 4445:4445 -v "$(pwd)/certs:/app/certs" cadmus
 ```bash
 cd frontend && npm run build
 npm run serve
-# https://localhost:4445 (certificat auto-signé généré dans frontend/certs/)
+# https://localhost:4446 (certificat auto-signé généré dans frontend/certs/)
 ```
 
 > Le certificat couvre `localhost`, `127.0.0.1` et l'IP LAN de la machine (détectée automatiquement).
 > Pour forcer une IP LAN spécifique (ex. accès depuis le téléphone) : `CADMUS_LAN_IP=192.168.1.50 npm run serve`.
 
-### Installation PWA sur le téléphone
+### HTTPS sur iPhone (via le Raspberry Pi 192.168.1.101)
 
-1. Connectez le téléphone au même réseau local que le Raspberry Pi.
-2. Ouvrez `https://<ip-du-pi>:4445` dans le navigateur (Chrome / Safari) et **acceptez l'avertissement de certificat** (certificat auto-signé).
-3. Une première visite charge et met toutes les ressources en cache.
-4. Utilisez le menu du navigateur → *Ajouter à l'écran d'accueil* (Android) ou *Partager → Ajouter à l'écran d'accueil* (iOS).
-5. L'application s'ouvre ensuite en plein écran et fonctionne **hors de votre réseau local**, sans connexion.
+Le certificat servi par le conteneur est signé par le **CA local mkcert** (généré dans `frontend/certs/`).
+Pour que l'iPhone l'accepte, une seule installation :
 
-> ⚠️ iOS impose HTTPS pour *Ajouter à l'écran d'accueil*. Avec un certificat auto-signé, l'installation PWA
-> complète sur iPhone nécessite d'installer le certificat comme profil de confiance (ou d'utiliser un vrai
-> certificat via Let's Encrypt / nginx sur le Pi).
+1. **Transférer `frontend/certs/rootCA.pem`** vers l'iPhone (AirDrop / e-mail) et l'ouvrir → *Installer le profil*.
+2. **Réglages → Général → VPN et gestion d'appareils** → installer le profil.
+3. **Réglages → Général → Informations → Réglages de confiance des certificats** → activer la **confiance totale** pour ce certificat.
+4. Ouvrir `https://192.168.1.101:4446` dans Safari → plus d'avertissement. *Ajouter à l'écran d'accueil* fonctionne alors (PWA + mode hors-ligne).
+
+> Les certificats (`frontend/certs/`) sont copiés avec le dépôt vers le Pi puis **montés** dans le conteneur
+> (volume `./frontend/certs:/app/certs` dans `docker-compose.prod.yml`). Le conteneur sert donc le **même
+> certificat approuvé** → aucun re-import après chaque déploiement. Pour ajouter une IP au certificat :
+> `CADMUS_LAN_IP=192.168.1.101 node frontend/scripts/ensure-certs.mjs` puis redéployer.

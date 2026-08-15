@@ -39,7 +39,7 @@
             "name": "Frontend - Debug (Brave)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://127.0.0.1:4445",
+            "url": "https://127.0.0.1:4446",
             "webRoot": "${workspaceFolder}/frontend",
             "sourceMapPathOverrides": {
                 "/@fs/*": "${webRoot}/*"

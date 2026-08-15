@@ -33,10 +33,10 @@ Le certificat du site couvre :
 
 | Mode | Adresse | Démarrage |
 |---|---|---|
-| Développement (Vite) | `https://localhost:4445` | `npm run dev` / `npm run debug` |
-| Production (statique) | `https://localhost:4445` | `npm run serve` |
-| Docker | port 4445 exposé | `docker run` |
-| Réseau local (téléphone) | `https://<ip-du-pi>:4445` | tout mode (écoute sur `0.0.0.0`) |
+| Développement (Vite) | `https://localhost:4446` | `npm run dev` / `npm run debug` |
+| Production (statique) | `https://localhost:4446` | `npm run serve` |
+| Docker | port 4446 exposé | `docker run` |
+| Réseau local (téléphone) | `https://<ip-du-pi>:4446` | tout mode (écoute sur `0.0.0.0`) |
 
 ## 4. Approuver le CA — étape unique par appareil
 
@@ -55,7 +55,7 @@ Le certificat du site couvre :
    ```
 3. **Redémarrer complètement le navigateur** (pas juste fermer la fenêtre).
 
-Après cela, `https://192.168.1.100:4445` s'ouvre **sans avertissement** dans Brave/Chrome.
+Après cela, `https://192.168.1.100:4446` s'ouvre **sans avertissement** dans Brave/Chrome.
 
 ### Firefox (magasin de certificats séparé)
 
@@ -84,7 +84,7 @@ certutil -d "sql:$PROF" -L | grep -i mkcert
 4. **Réglages → Général → Informations → Réglages de confiance des certificats** → activer la
    **confiance totale** pour ce certificat.
 
-Safari accepte alors `https://<ip>:4445` et l'installation PWA fonctionne.
+Safari accepte alors `https://<ip>:4446` et l'installation PWA fonctionne.
 
 ---
 
@@ -107,7 +107,7 @@ Safari accepte alors `https://<ip>:4445` et l'installation PWA fonctionne.
 | Firefox : *"Be careful. Something doesn't look right"* | CA absent du magasin propre à Firefox | Ajouter le CA dans le profil Firefox (section 4) et redémarrer Firefox |
 | *"no Firefox/Chrome security databases found"* | `$HOME` = `/root` sous `sudo`, ou base NSS absente | Créer `~/.pki/nssdb` et ajouter le CA avec `certutil` (étape 2) |
 | `192.168.1.100` non couvert par le certificat | IP LAN non détectée au moment de la génération | Régénérer avec `CADMUS_LAN_IP=192.168.1.100` |
-| Port 4445 déjà occupé (ancien serveur HTTP) | Processus obsolète encore actif | Arrêter les anciens serveurs avant de lancer le HTTPS |
+| Port 4446 déjà occupé (ancien serveur HTTP) | Processus obsolète encore actif | Arrêter les anciens serveurs avant de lancer le HTTPS |
 
 ## 7. Commandes exécutées (récapitulatif)
 
@@ -128,7 +128,7 @@ PROF="$HOME/snap/firefox/common/.mozilla/firefox/w3cdfsmg.default"
 certutil -d "sql:$PROF" -A -t "C,," -n "mkcert" -i "$(mkcert -CAROOT)/rootCA.pem"
 
 # 5) Vérifier le certificat réellement servi (issuer = mkcert development CA, SAN = IP LAN)
-echo | openssl s_client -connect 127.0.0.1:4445 | openssl x509 -noout -issuer -ext subjectAltName
+echo | openssl s_client -connect 127.0.0.1:4446 | openssl x509 -noout -issuer -ext subjectAltName
 
 # 6) Lancer le serveur HTTPS
 npm run serve   # ou : npm run dev

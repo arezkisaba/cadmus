@@ -6,7 +6,7 @@ import { ensureCerts } from './ensure-certs.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
-const PORT = Number(process.env.CADMUS_PORT ?? 4445);
+const PORT = Number(process.env.CADMUS_PORT ?? 4446);
 const HOST = process.env.CADMUS_HOST ?? '0.0.0.0';
 
 const MIME_TYPES = {
@@ -74,5 +74,5 @@ const server = createServer({ key: readFileSync(key), cert: readFileSync(cert) }
 
 server.listen(PORT, HOST, () => {
     console.log(`Cadmus served over HTTPS on https://localhost:${PORT}`);
-    console.log('  LAN access: https://<this-machine-ip>:4445');
+    console.log('  LAN access: https://<this-machine-ip>:4446');
 });

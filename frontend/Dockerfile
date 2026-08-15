@@ -21,5 +21,5 @@ COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/frontend/scripts ./scripts
 RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
 
-EXPOSE 4445
+EXPOSE 4446
 CMD ["node", "scripts/serve-https.mjs"]

@@ -1,6 +1,6 @@
 export const CONFIG = {
     APP_NAME: 'Cadmus',
-    FRONTEND_PORT: 4445,
+    FRONTEND_PORT: 4446,
     DEEPSEEK_API_URL: 'https://api.deepseek.com/chat/completions',
     DEEPSEEK_MODEL: 'deepseek-v4-flash',
     QWEN_API_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',

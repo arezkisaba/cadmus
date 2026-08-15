@@ -29,7 +29,7 @@ export default defineConfig(({ command }) => {
             },
         },
         server: {
-            port: 4445,
+            port: 4446,
             host: true,
             https,
         },
