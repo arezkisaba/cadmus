@@ -1,0 +1,6 @@
+services:
+  frontend:
+    image: {{DOCKER_REPO}}:{{FRONTEND_NAME}}
+    ports:
+      - "4445:4445"
+    restart: unless-stopped

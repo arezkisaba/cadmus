@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Frontend - Build",
+            "type": "shell",
+            "command": "npx tsc -b",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            },
+            "problemMatcher": "$tsc",
+            "isBackground": false,
+            "presentation": {
+                "reveal": "silent",
+                "close": true
+            }
+        },
+        {
+            "label": "Frontend - Terminate",
+            "type": "shell",
+            "command": "pkill -f 'vite --debug' || echo 'No process found'",
+            "presentation": {
+                "reveal": "silent",
+                "close": true
+            },
+            "isBackground": false,
+            "linux": {
+                "command": "pkill -f 'vite --debug' || echo 'No process found'"
+            },
+            "windows": {
+                "command": "taskkill /F /IM node.exe /FI \"WINDOWTITLE eq vite --debug\" || echo 'No process found'"
+            },
+            "osx": {
+                "command": "pkill -f 'vite --debug' || echo 'No process found'"
+            }
+        }
+    ]
+}

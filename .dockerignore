@@ -1,0 +1,28 @@
+# Ignore node_modules everywhere
+node_modules
+**/node_modules
+frontend/node_modules
+shared/node_modules
+
+# Build outputs and local artifacts
+dist
+frontend/dist
+shared/dist
+build
+coverage
+
+# HTTPS private keys (do not bake into image layers; mount as a volume)
+frontend/certs/
+
+# VCS and editor files
+.git
+.gitignore
+.vscode
+
+# Logs and env
+npm-debug.log*
+.env
+.env.*
+
+# OS files
+.DS_Store

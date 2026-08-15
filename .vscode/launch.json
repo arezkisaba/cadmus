@@ -1,0 +1,125 @@
+{
+    "version": "0.2.0",
+    "compounds": [
+        {
+            "name": "> Frontend - Debug",
+            "configurations": [
+                "Frontend - Debug (IDE)",
+                "Frontend - Debug (Brave)"
+            ],
+            "stopAll": true
+        },
+        {
+            "name": "> Frontend Tests - Debug",
+            "configurations": [
+                "Frontend Tests - Debug all"
+            ],
+            "stopAll": true
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Frontend - Debug (IDE)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "debug"
+            ],
+            "cwd": "${workspaceFolder}/frontend",
+            "console": "integratedTerminal",
+            "preLaunchTask": "Frontend - Build",
+            "postDebugTask": "Frontend - Terminate",
+            "presentation": {
+                "hidden": true
+            }
+        },
+        {
+            "name": "Frontend - Debug (Brave)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "https://127.0.0.1:4445",
+            "webRoot": "${workspaceFolder}/frontend",
+            "sourceMapPathOverrides": {
+                "/@fs/*": "${webRoot}/*"
+            },
+            "runtimeExecutable": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+            "runtimeArgs": [
+                "--incognito",
+                "--new-window",
+                "--start-maximized",
+                "--auto-open-devtools-for-tabs",
+                "--ignore-certificate-errors"
+            ],
+            "windows": {
+                "runtimeExecutable": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
+                "runtimeArgs": [
+                    "--incognito",
+                    "--new-window",
+                    "--start-maximized",
+                    "--auto-open-devtools-for-tabs",
+                    "--ignore-certificate-errors"
+                ]
+            },
+            "linux": {
+                "runtimeExecutable": "/usr/bin/brave-browser",
+                "runtimeArgs": [
+                    "--incognito",
+                    "--new-window",
+                    "--start-maximized",
+                    "--auto-open-devtools-for-tabs",
+                    "--ignore-certificate-errors"
+                ]
+            },
+            "presentation": {
+                "hidden": true
+            }
+        },
+        {
+            "name": "Frontend Tests - Debug all",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "node",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceFolder}/frontend/node_modules/.bin/jest",
+                "--runInBand"
+            ],
+            "port": 9229,
+            "console": "integratedTerminal",
+            "windows": {
+                "runtimeArgs": [
+                    "--inspect-brk",
+                    "${workspaceFolder}/frontend/node_modules/jest/bin/jest.js",
+                    "--runInBand"
+                ]
+            },
+            "cwd": "${workspaceFolder}/frontend",
+            "preLaunchTask": "Frontend - Build"
+        },
+        {
+            "name": "Frontend Tests - Debug current",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "node",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceFolder}/frontend/node_modules/.bin/jest",
+                "${relativeFile}",
+                "--runInBand"
+            ],
+            "port": 9229,
+            "console": "integratedTerminal",
+            "windows": {
+                "runtimeArgs": [
+                    "--inspect-brk",
+                    "${workspaceFolder}/frontend/node_modules/jest/bin/jest.js",
+                    "--runInBand"
+                ]
+            },
+            "cwd": "${workspaceFolder}/frontend",
+            "preLaunchTask": "Frontend - Build"
+        }
+    ]
+}

@@ -1,0 +1,78 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": false
+    },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": "on"
+            }
+        }
+    },
+    "files": {
+        "ignoreUnknown": false,
+        "includes": [
+            "**",
+            "!**/node_modules",
+            "!**/dist",
+            "!**/build",
+            "!**/coverage",
+            "!**/*.config.js",
+            "!**/*.config.ts",
+            "!**/components/ui/**/*.tsx",
+            "!**/.mcp.json"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 150,
+        "lineEnding": "lf"
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "correctness": {
+                "noUnusedVariables": "warn",
+                "noUnusedImports": "warn"
+            },
+            "style": {
+                "useImportType": "warn",
+                "useConst": "warn",
+                "useNodejsImportProtocol": "warn",
+                "noNonNullAssertion": "off"
+            },
+            "suspicious": {
+                "noExplicitAny": "warn"
+            },
+            "complexity": {
+                "useLiteralKeys": "warn"
+            },
+            "nursery": {
+                "useSortedClasses": "off"
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "jsxQuoteStyle": "double",
+            "trailingCommas": "es5",
+            "semicolons": "always"
+        },
+        "parser": {
+            "unsafeParameterDecoratorsEnabled": true
+        }
+    },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
+        }
+    }
+}

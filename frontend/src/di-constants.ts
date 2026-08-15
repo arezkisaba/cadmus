@@ -1,0 +1,18 @@
+export const DI_CONSTANTS = {
+    IDatabaseService: 'IDatabaseService',
+    ISettingsService: 'ISettingsService',
+    IAiGenerationService: 'IAiGenerationService',
+    IDeepSeekAiProvider: 'IDeepSeekAiProvider',
+    IQwenAiProvider: 'IQwenAiProvider',
+    IChatGptAiProvider: 'IChatGptAiProvider',
+    IAiProviders: 'IAiProviders',
+    IImageSearchService: 'IImageSearchService',
+    IPixabayImageSearchService: 'IPixabayImageSearchService',
+    IPexelsImageSearchService: 'IPexelsImageSearchService',
+    IUnsplashImageSearchService: 'IUnsplashImageSearchService',
+    IOpenverseImageSearchService: 'IOpenverseImageSearchService',
+    IWikimediaImageSearchService: 'IWikimediaImageSearchService',
+    IImageSearchProviders: 'IImageSearchProviders',
+    ICategoriesService: 'ICategoriesService',
+    IFlashcardService: 'IFlashcardService',
+} as const;
