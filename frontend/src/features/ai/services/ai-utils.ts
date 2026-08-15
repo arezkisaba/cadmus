@@ -13,6 +13,7 @@ export function buildCategoryMessages(request: IGenerateCategoryRequest): IAiMes
                 'You are a language learning assistant.',
                 `The source language is ${request.sourceLang} and the target language is ${request.targetLang}.`,
                 'Given a theme prompt, generate a vocabulary list of common, everyday items related to the theme.',
+                'Avoid words that are spelled the same in both languages (e.g. "bus" is identical in French and English); prefer words that actually differ between the two languages so they are worth learning.',
                 'Respond with a single JSON object in this exact format:',
                 '{"categoryName": "short category name", "items": [{"front": "word in ' +
                     request.sourceLang +
