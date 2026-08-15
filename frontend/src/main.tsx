@@ -6,9 +6,19 @@ import './index.css';
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch((error: unknown) => {
-            console.error('Service worker registration failed', error);
-        });
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then(() => {
+                // Première activation : recharge une fois pour que la page et tous
+                // ses assets (JS/CSS) passent par le service worker et soient mis en cache.
+                if (!navigator.serviceWorker.controller && !sessionStorage.getItem('cadmus-sw-reloaded')) {
+                    sessionStorage.setItem('cadmus-sw-reloaded', '1');
+                    window.location.reload();
+                }
+            })
+            .catch((error: unknown) => {
+                console.error('Service worker registration failed', error);
+            });
     });
 }
 

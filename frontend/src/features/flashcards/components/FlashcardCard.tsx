@@ -1,5 +1,5 @@
 import type { IFlashcard } from '@shared/models/FlashcardModels';
-import { Check, History, Languages, Volume2, X } from 'lucide-react';
+import { Check, Eye, History, Languages, Volume2, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,8 +35,8 @@ const CardStats: React.FC<{ card: IFlashcard }> = ({ card }) => (
 export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang, targetLang, onAnswer }) => {
     const [flipped, setFlipped] = useState(false);
 
-    const handleFlip = useCallback((): void => {
-        setFlipped((prev) => !prev);
+    const handleReveal = useCallback((): void => {
+        setFlipped(true);
     }, []);
 
     const handleAnswer = useCallback(
@@ -48,20 +48,21 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
     );
 
     return (
-        <div className="flip-card mx-auto h-[30rem] w-full max-w-md select-none">
+        <div className="flip-card mx-auto h-[26rem] w-full max-w-md select-none">
             <div className={`flip-card-inner relative h-full w-full ${flipped ? 'is-flipped' : ''}`}>
-                <div className="flip-card-face bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-6 shadow-lg">
+                <div className="flip-card-face bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-5 shadow-lg">
                     <CardStats card={card} />
-                    <div className="flex flex-1 flex-col items-center justify-center gap-5">
-                        <button
-                            type="button"
-                            onClick={handleFlip}
-                            className="flex cursor-pointer flex-col items-center justify-center gap-5 focus:outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                        >
+                    <div className="flex flex-1 flex-col items-center justify-center gap-4">
+                        <div className="flex flex-col items-center gap-3">
                             {card.imageUrl ? (
-                                <img src={card.imageUrl} alt={card.front} className="h-32 w-32 rounded-2xl object-cover" decoding="async" />
+                                <img
+                                    src={card.imageUrl}
+                                    alt={card.front}
+                                    className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
+                                    decoding="async"
+                                />
                             ) : (
-                                <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl">
+                                <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl border border-gray-200 dark:border-gray-700">
                                     <Languages className="size-10" />
                                 </div>
                             )}
@@ -69,7 +70,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                             {card.frontDefinition !== undefined && card.frontDefinition.length > 0 && (
                                 <span className="text-muted-foreground max-w-sm text-center text-sm">{card.frontDefinition}</span>
                             )}
-                        </button>
+                        </div>
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
@@ -81,23 +82,27 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                             </button>
                         </div>
                     </div>
-                    <div className="mt-4 flex h-10 items-center justify-center">
-                        <span className="text-muted-foreground text-xs font-medium tracking-widest uppercase">Tap to reveal</span>
+                    <div className="mt-3 flex h-12 w-full">
+                        <Button variant="outline" className="w-full" onClick={handleReveal}>
+                            <Eye />
+                            Reveal
+                        </Button>
                     </div>
                 </div>
 
-                <div className="flip-card-face flip-card-back bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-6 shadow-lg">
+                <div className="flip-card-face flip-card-back bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-5 shadow-lg">
                     <CardStats card={card} />
-                    <div className="flex flex-1 flex-col items-center justify-center gap-5">
-                        <button
-                            type="button"
-                            onClick={handleFlip}
-                            className="flex cursor-pointer flex-col items-center justify-center gap-5 focus:outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                        >
+                    <div className="flex flex-1 flex-col items-center justify-center gap-4">
+                        <div className="flex flex-col items-center gap-3">
                             {card.imageUrl ? (
-                                <img src={card.imageUrl} alt={card.back} className="h-32 w-32 rounded-2xl object-cover" decoding="async" />
+                                <img
+                                    src={card.imageUrl}
+                                    alt={card.back}
+                                    className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
+                                    decoding="async"
+                                />
                             ) : (
-                                <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl">
+                                <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl border border-gray-200 dark:border-gray-700">
                                     <Languages className="size-10" />
                                 </div>
                             )}
@@ -105,7 +110,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                             {card.backDefinition !== undefined && card.backDefinition.length > 0 && (
                                 <span className="text-muted-foreground max-w-sm text-center text-sm">{card.backDefinition}</span>
                             )}
-                        </button>
+                        </div>
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
@@ -117,7 +122,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                             </button>
                         </div>
                     </div>
-                    <div className="mt-4 flex h-10 w-full gap-3">
+                    <div className="mt-3 flex h-12 w-full gap-3">
                         <Button
                             variant="outline"
                             className="hover:bg-red-500/10 flex-1 border-red-500/40 text-red-600"
