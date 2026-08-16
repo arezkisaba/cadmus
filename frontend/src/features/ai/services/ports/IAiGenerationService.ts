@@ -3,4 +3,5 @@ import type { IGenerateCategoryRequest, IGenerateCategoryResponse } from '@share
 export interface IAiGenerationService {
     isAvailable(): boolean;
     generateCategory(request: IGenerateCategoryRequest): Promise<IGenerateCategoryResponse>;
+    translateSongLyrics(lyrics: string, sourceLang: string, targetLang: string): Promise<string[]>;
 }

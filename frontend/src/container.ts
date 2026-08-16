@@ -20,6 +20,8 @@ import { UnsplashImageSearchService } from './features/images/services/providers
 import { WikimediaImageSearchService } from './features/images/services/providers/WikimediaImageSearchService';
 import type { ISettingsService } from './features/settings/services/ports/ISettingsService';
 import { SettingsService } from './features/settings/services/SettingsService';
+import type { ISongsService } from './features/songs/services/ports/ISongsService';
+import { SongsService } from './features/songs/services/SongsService';
 
 container.registerSingleton<DatabaseService>(DI_CONSTANTS.IDatabaseService, DatabaseService);
 container.registerSingleton<ISettingsService>(DI_CONSTANTS.ISettingsService, SettingsService);
@@ -51,5 +53,6 @@ container.register<IImageSearchService[]>(DI_CONSTANTS.IImageSearchProviders, {
 container.registerSingleton<IImageSearchService>(DI_CONSTANTS.IImageSearchService, ImageSearchService);
 container.registerSingleton<ICategoriesService>(DI_CONSTANTS.ICategoriesService, CategoriesService);
 container.registerSingleton<IFlashcardService>(DI_CONSTANTS.IFlashcardService, FlashcardsService);
+container.registerSingleton<ISongsService>(DI_CONSTANTS.ISongsService, SongsService);
 
 export { DI_CONSTANTS };

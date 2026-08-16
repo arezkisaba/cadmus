@@ -95,9 +95,35 @@ export function parseCategoryResponse(content: string): IGenerateCategoryRespons
     };
 }
 
+export function buildSongTranslationMessages(lyrics: string, sourceLang: string, targetLang: string): IAiMessage[] {
+    return [
+        {
+            role: 'system',
+            content: [
+                'You are a professional translator and language teacher.',
+                `Translate the song lyrics from ${sourceLang} to ${targetLang}.`,
+                'Preserve the meaning and, when possible, the tone of each line.',
+                'Respond with a single JSON object in this exact format:',
+                '{"lines": ["translation of line 1", "translation of line 2", ...]}',
+                'Provide exactly one translation per line, in the same order as the lyrics, using an empty string for blank lines. Return only valid JSON without markdown.',
+            ].join(' '),
+        },
+        {
+            role: 'user',
+            content: lyrics,
+        },
+    ];
+}
+
+export function parseSongTranslation(content: string): string[] {
+    const parsed = parseJsonContent(content);
+    return Array.isArray(parsed.lines) ? parsed.lines.map((line) => String(line ?? '').trim()) : [];
+}
+
 interface IParsedCategory {
     categoryName?: string;
     items?: IFlashcardItem[];
+    lines?: string[];
 }
 
 function parseJsonContent(content: string): IParsedCategory {

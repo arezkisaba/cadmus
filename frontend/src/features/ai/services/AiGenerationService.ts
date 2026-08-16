@@ -35,4 +35,25 @@ export class AiGenerationService implements IAiGenerationService {
         }
         throw new Error('All AI providers failed to generate a response');
     }
+
+    public async translateSongLyrics(lyrics: string, sourceLang: string, targetLang: string): Promise<string[]> {
+        const available = this.providers.filter((provider) => provider.isAvailable());
+        if (available.length === 0) {
+            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen or ChatGPT API key in Settings.');
+        }
+
+        let lastError: unknown = null;
+        for (const provider of available) {
+            try {
+                return await provider.translateSongLyrics(lyrics, sourceLang, targetLang);
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        if (lastError instanceof Error) {
+            throw lastError;
+        }
+        throw new Error('All AI providers failed to translate the lyrics');
+    }
 }

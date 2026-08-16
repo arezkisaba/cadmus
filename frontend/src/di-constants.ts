@@ -15,4 +15,5 @@ export const DI_CONSTANTS = {
     IImageSearchProviders: 'IImageSearchProviders',
     ICategoriesService: 'ICategoriesService',
     IFlashcardService: 'IFlashcardService',
+    ISongsService: 'ISongsService',
 } as const;

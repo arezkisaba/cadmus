@@ -29,6 +29,7 @@ describe('AiGenerationService (composite)', () => {
         const unavailable = {
             isAvailable: () => false,
             generateCategory: jest.fn(),
+            translateSongLyrics: jest.fn(),
         } satisfies IAiGenerationService;
         const service = new AiGenerationService([unavailable]);
         await expect(service.generateCategory(REQUEST)).rejects.toThrow('No AI provider is configured');
@@ -38,10 +39,12 @@ describe('AiGenerationService (composite)', () => {
         const first = {
             isAvailable: () => true,
             generateCategory: jest.fn(async () => ({ categoryName: 'A', items: [{ front: 'a', back: 'b' }] })),
+            translateSongLyrics: jest.fn(),
         } satisfies IAiGenerationService;
         const second = {
             isAvailable: () => true,
             generateCategory: jest.fn(),
+            translateSongLyrics: jest.fn(),
         } satisfies IAiGenerationService;
         const service = new AiGenerationService([first, second]);
         const result = await service.generateCategory(REQUEST);
@@ -55,10 +58,12 @@ describe('AiGenerationService (composite)', () => {
             generateCategory: jest.fn(async () => {
                 throw new Error('first failed');
             }),
+            translateSongLyrics: jest.fn(),
         } satisfies IAiGenerationService;
         const second = {
             isAvailable: () => true,
             generateCategory: jest.fn(async () => ({ categoryName: 'B', items: [{ front: 'x', back: 'y' }] })),
+            translateSongLyrics: jest.fn(),
         } satisfies IAiGenerationService;
         const service = new AiGenerationService([first, second]);
         await expect(service.generateCategory(REQUEST)).resolves.toMatchObject({ categoryName: 'B' });
@@ -70,6 +75,7 @@ describe('AiGenerationService (composite)', () => {
             generateCategory: jest.fn(async () => {
                 throw new Error('boom');
             }),
+            translateSongLyrics: jest.fn(),
         } satisfies IAiGenerationService;
         const service = new AiGenerationService([failing]);
         await expect(service.generateCategory(REQUEST)).rejects.toThrow('boom');

@@ -1,5 +1,5 @@
 import { Separator } from '@radix-ui/react-separator';
-import { FolderOpen, Languages, Settings } from 'lucide-react';
+import { FolderOpen, Languages, Music, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './theme-toggle';
 import {
@@ -24,6 +24,11 @@ const MENU_ITEMS = [
         title: 'Categories',
         icon: FolderOpen,
         path: '/',
+    },
+    {
+        title: 'Songs',
+        icon: Music,
+        path: '/songs',
     },
     {
         title: 'Settings',
@@ -85,6 +90,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         }
         if (location.pathname.startsWith('/review')) {
             return 'Review';
+        }
+        if (location.pathname.startsWith('/songs')) {
+            return 'Songs';
         }
         return 'Categories';
     };
