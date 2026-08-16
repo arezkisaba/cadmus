@@ -19,10 +19,10 @@ interface IPexelsResponse {
 export class PexelsImageSearchService implements IImageSearchService {
     public constructor(@inject(DI_CONSTANTS.ISettingsService) private readonly settingsService: ISettingsService) {}
 
-    public async findFirstImage(item: IFlashcardItem): Promise<string | null> {
+    public async findImages(item: IFlashcardItem): Promise<string[]> {
         const settings = this.settingsService.getSettings();
         if (settings.pexelsApiKey.length === 0) {
-            return null;
+            return [];
         }
 
         const url = new URL(CONFIG.PEXELS_API_URL);
@@ -35,9 +35,12 @@ export class PexelsImageSearchService implements IImageSearchService {
             },
         });
         if (!response.ok) {
-            return null;
+            return [];
         }
         const data = (await response.json()) as IPexelsResponse;
-        return data.photos?.[0]?.src?.medium ?? null;
+        return (data.photos ?? [])
+            .map((photo) => photo.src?.medium ?? '')
+            .filter((imageUrl): imageUrl is string => imageUrl.length > 0)
+            .slice(0, 3);
     }
 }

@@ -11,6 +11,7 @@ import { DI_CONSTANTS } from '@/di-constants';
 import { LANGUAGES } from '@/features/settings/models/languages';
 import type { ISettingsService } from '@/features/settings/services/ports/ISettingsService';
 import { useInjection } from '@/hooks/use-container';
+import { CARD_COUNT_OPTIONS, DEFAULT_CARD_COUNT } from '../card-count';
 import type { ICategoriesService } from '../services/ports/ICategoriesService';
 
 interface ICreateCategoryDialogProps {
@@ -18,9 +19,7 @@ interface ICreateCategoryDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-const EXAMPLE_PROMPTS = ['les vêtements de tous les jours', 'la nourriture au restaurant', 'le vocabulaire du voyage', 'les objets de la maison'];
-const CARD_COUNT_OPTIONS = [10, 15, 20, 25, 30, 40, 50];
-const DEFAULT_CARD_COUNT = 20;
+const EXAMPLE_PROMPTS = ['les vêtements de tous les jours', 'la nourriture au restaurant'];
 
 export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ open, onOpenChange }) => {
     const categoriesService = useInjection<ICategoriesService>(DI_CONSTANTS.ICategoriesService);

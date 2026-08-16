@@ -1,3 +1,4 @@
+import type { IFlashcardCategory } from '@shared/models/FlashcardModels';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Plus, Sparkles } from 'lucide-react';
 import { useCallback, useState } from 'react';
@@ -9,8 +10,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DI_CONSTANTS } from '@/di-constants';
 import { useInjection } from '@/hooks/use-container';
 import type { ICategoryStats, IFlashcardService } from '../../flashcards/services/ports/IFlashcardService';
+import { DEFAULT_CARD_COUNT } from '../card-count';
 import { CategoryCard } from '../components/CategoryCard';
 import { CreateCategoryDialog } from '../components/CreateCategoryDialog';
+import { ResetCategoryDialog } from '../components/ResetCategoryDialog';
 import type { ICategoriesService } from '../services/ports/ICategoriesService';
 
 const SKELETON_KEYS = ['skeleton-1', 'skeleton-2', 'skeleton-3'];
@@ -20,6 +23,8 @@ export const CategoriesPage: React.FC = () => {
     const flashcardsService = useInjection<IFlashcardService>(DI_CONSTANTS.IFlashcardService);
     const navigate = useNavigate();
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [resetCategory, setResetCategory] = useState<IFlashcardCategory | null>(null);
+    const [resetCount, setResetCount] = useState(DEFAULT_CARD_COUNT);
 
     const data = useLiveQuery(async (): Promise<{
         categories: Awaited<ReturnType<ICategoriesService['getAll']>>;
@@ -49,6 +54,18 @@ export const CategoriesPage: React.FC = () => {
             toast.success('Category deleted');
         },
         [categoriesService]
+    );
+
+    const handleReset = useCallback(
+        (id: string): void => {
+            const category = data?.categories.find((item) => item.id === id);
+            if (category === undefined) {
+                return;
+            }
+            setResetCount(data?.stats.get(id)?.total ?? DEFAULT_CARD_COUNT);
+            setResetCategory(category);
+        },
+        [data]
     );
 
     const renderSkeletons = (): React.ReactNode => (
@@ -98,12 +115,31 @@ export const CategoriesPage: React.FC = () => {
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {data.categories.map((category) => {
                         const stats = data.stats.get(category.id);
-                        return <CategoryCard key={category.id} category={category} stats={stats} onReview={handleReview} onDelete={handleDelete} />;
+                        return (
+                            <CategoryCard
+                                key={category.id}
+                                category={category}
+                                stats={stats}
+                                onReview={handleReview}
+                                onReset={handleReset}
+                                onDelete={handleDelete}
+                            />
+                        );
                     })}
                 </div>
             )}
 
             <CreateCategoryDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+            <ResetCategoryDialog
+                category={resetCategory}
+                initialCount={resetCount}
+                open={resetCategory !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setResetCategory(null);
+                    }
+                }}
+            />
         </div>
     );
 };

@@ -34,6 +34,13 @@ const CardStats: React.FC<{ card: IFlashcard }> = ({ card }) => (
 
 export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang, targetLang, onAnswer }) => {
     const [flipped, setFlipped] = useState(false);
+    const [displayImage] = useState<string | null>(() => {
+        const candidates = [card.imageUrl, card.imageUrl2].filter((url): url is string => typeof url === 'string' && url.length > 0);
+        if (candidates.length === 0) {
+            return null;
+        }
+        return candidates[Math.floor(Math.random() * candidates.length)] ?? null;
+    });
 
     const handleReveal = useCallback((): void => {
         setFlipped(true);
@@ -54,9 +61,9 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                     <CardStats card={card} />
                     <div className="flex flex-1 flex-col items-center justify-center gap-4">
                         <div className="flex flex-col items-center gap-3">
-                            {card.imageUrl ? (
+                            {displayImage ? (
                                 <img
-                                    src={card.imageUrl}
+                                    src={displayImage}
                                     alt={card.front}
                                     className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
                                     decoding="async"
@@ -94,9 +101,9 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                     <CardStats card={card} />
                     <div className="flex flex-1 flex-col items-center justify-center gap-4">
                         <div className="flex flex-col items-center gap-3">
-                            {card.imageUrl ? (
+                            {displayImage ? (
                                 <img
-                                    src={card.imageUrl}
+                                    src={displayImage}
                                     alt={card.back}
                                     className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
                                     decoding="async"

@@ -15,7 +15,7 @@ interface IOpenverseResponse {
 
 @injectable()
 export class OpenverseImageSearchService implements IImageSearchService {
-    public async findFirstImage(item: IFlashcardItem): Promise<string | null> {
+    public async findImages(item: IFlashcardItem): Promise<string[]> {
         const query = item.back ?? item.front;
         const url = new URL(OPENVERSE_API_URL);
         url.searchParams.set('q', query);
@@ -23,10 +23,12 @@ export class OpenverseImageSearchService implements IImageSearchService {
 
         const response = await fetch(url.toString());
         if (!response.ok) {
-            return null;
+            return [];
         }
         const data = (await response.json()) as IOpenverseResponse;
-        const first = data.results?.[0];
-        return first?.thumbnail ?? first?.url ?? null;
+        return (data.results ?? [])
+            .map((result) => result.thumbnail ?? result.url ?? '')
+            .filter((imageUrl): imageUrl is string => imageUrl.length > 0)
+            .slice(0, 3);
     }
 }

@@ -12,6 +12,15 @@ import type { ICategoriesService } from '../../categories/services/ports/ICatego
 import { FlashcardCard } from '../components/FlashcardCard';
 import type { IFlashcardService } from '../services/ports/IFlashcardService';
 
+const shuffle = (cards: IFlashcard[]): IFlashcard[] => {
+    const shuffled = [...cards];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
 export const FlashcardReviewPage: React.FC = () => {
     const { categoryId } = useParams<{ categoryId: string }>();
     const navigate = useNavigate();
@@ -33,24 +42,15 @@ export const FlashcardReviewPage: React.FC = () => {
             if (categoryId === undefined) {
                 return;
             }
-            const now = Date.now();
             const [loadedCategory, loadedCards] = await Promise.all([
                 categoriesService.getById(categoryId),
                 flashcardsService.getAllByCategory(categoryId),
             ]);
-            loadedCards.sort((a, b) => {
-                const aDue = a.nextReviewAt === null || a.nextReviewAt <= now ? 0 : 1;
-                const bDue = b.nextReviewAt === null || b.nextReviewAt <= now ? 0 : 1;
-                if (aDue !== bDue) {
-                    return aDue - bDue;
-                }
-                return (a.nextReviewAt ?? 0) - (b.nextReviewAt ?? 0);
-            });
             if (cancelled) {
                 return;
             }
             setCategory(loadedCategory);
-            setDeck(loadedCards);
+            setDeck(shuffle(loadedCards));
             completedRef.current = false;
             setLoading(false);
         };
@@ -62,9 +62,11 @@ export const FlashcardReviewPage: React.FC = () => {
 
     useEffect(() => {
         for (const card of deck) {
-            if (card.imageUrl) {
-                const image = new window.Image();
-                image.src = card.imageUrl;
+            for (const url of [card.imageUrl, card.imageUrl2]) {
+                if (url) {
+                    const image = new window.Image();
+                    image.src = url;
+                }
             }
         }
     }, [deck]);
@@ -131,9 +133,7 @@ export const FlashcardReviewPage: React.FC = () => {
                     <CheckCircle2 className="size-8" />
                 </div>
                 <h2 className="text-xl font-semibold">No cards to review</h2>
-                <p className="text-muted-foreground max-w-sm text-sm">
-                    This category has no flashcards yet. Create a new category to get started.
-                </p>
+                <p className="text-muted-foreground max-w-sm text-sm">This category has no flashcards yet. Create a new category to get started.</p>
                 <Button onClick={handleBack}>
                     <ArrowLeft />
                     Back to categories

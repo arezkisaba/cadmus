@@ -17,25 +17,28 @@ interface IPixabayResponse {
 export class PixabayImageSearchService implements IImageSearchService {
     public constructor(@inject(DI_CONSTANTS.ISettingsService) private readonly settingsService: ISettingsService) {}
 
-    public async findFirstImage(item: IFlashcardItem): Promise<string | null> {
+    public async findImages(item: IFlashcardItem): Promise<string[]> {
         const settings = this.settingsService.getSettings();
         if (settings.pixabayApiKey.length === 0) {
-            return null;
+            return [];
         }
 
         const url = new URL(CONFIG.PIXABAY_API_URL);
         url.searchParams.set('key', settings.pixabayApiKey);
         url.searchParams.set('q', item.front);
         url.searchParams.set('lang', settings.sourceLang);
-        url.searchParams.set('per_page', '3');
+        url.searchParams.set('per_page', '5');
         url.searchParams.set('image_type', 'photo');
         url.searchParams.set('safesearch', 'true');
 
         const response = await fetch(url.toString());
         if (!response.ok) {
-            return null;
+            return [];
         }
         const data = (await response.json()) as IPixabayResponse;
-        return data.hits?.[0]?.webformatURL ?? null;
+        return (data.hits ?? [])
+            .map((hit) => hit.webformatURL)
+            .filter((imageUrl): imageUrl is string => typeof imageUrl === 'string' && imageUrl.length > 0)
+            .slice(0, 3);
     }
 }

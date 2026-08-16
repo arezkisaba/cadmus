@@ -17,6 +17,7 @@ export interface IFlashcard {
     frontDefinition?: string;
     backDefinition?: string;
     imageUrl: string | null;
+    imageUrl2?: string | null;
     level: number;
     reviewCount: number;
     correctCount: number;

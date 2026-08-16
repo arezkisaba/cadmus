@@ -1,4 +1,4 @@
-import type { IFlashcard, IFlashcardCategory, IGenerateCategoryRequest } from '@shared/models/FlashcardModels';
+import type { IFlashcard, IFlashcardCategory, IFlashcardItem, IGenerateCategoryRequest } from '@shared/models/FlashcardModels';
 import { inject, injectable } from 'tsyringe';
 import { DI_CONSTANTS } from '../../../di-constants';
 import type { DatabaseService } from '../../_shared/services/DatabaseService';
@@ -70,41 +70,7 @@ export class CategoriesService implements ICategoriesService {
         };
 
         const useImages = settings.useImages;
-        const cards: IFlashcard[] = [];
-        const total = result.items.length;
-        let completedImages = 0;
-        const imageUrls = await mapWithConcurrency(result.items, IMAGE_CONCURRENCY, async (item) => {
-            if (!useImages) {
-                return null;
-            }
-            let imageUrl: string | null = null;
-            try {
-                imageUrl = await this.imageSearchService.findFirstImage(item);
-            } catch {
-                imageUrl = null;
-            }
-            completedImages += 1;
-            onProgress?.(`Searching images (${completedImages}/${total})...`);
-            return imageUrl;
-        });
-        for (const [index, item] of result.items.entries()) {
-            cards.push({
-                id: generateId(),
-                categoryId,
-                front: item.front,
-                back: item.back,
-                frontDefinition: item.frontDefinition,
-                backDefinition: item.backDefinition,
-                imageUrl: imageUrls[index],
-                level: 0,
-                reviewCount: 0,
-                correctCount: 0,
-                wrongCount: 0,
-                lastReviewedAt: null,
-                nextReviewAt: null,
-                lastResult: null,
-            });
-        }
+        const cards = await this.buildCards(categoryId, result.items, useImages, onProgress);
 
         await this.databaseService.database.transaction(
             'rw',
@@ -120,6 +86,38 @@ export class CategoriesService implements ICategoriesService {
         return category;
     }
 
+    public async resetCategory(categoryId: string, itemCount: number, onProgress?: (stage: string) => void): Promise<void> {
+        const category = await this.databaseService.database.categories.get(categoryId);
+        if (category === undefined) {
+            return;
+        }
+        const request: IGenerateCategoryRequest = {
+            prompt: category.prompt,
+            sourceLang: category.sourceLang,
+            targetLang: category.targetLang,
+            itemCount,
+        };
+        onProgress?.('Generating vocabulary with AI...');
+        const result = await this.aiGenerationService.generateCategory(request);
+        const settings = this.settingsService.getSettings();
+        const cards = await this.buildCards(categoryId, result.items, settings.useImages, onProgress);
+        const updatedCategory: IFlashcardCategory = {
+            ...category,
+            sessionCount: 0,
+        };
+        await this.databaseService.database.transaction(
+            'rw',
+            [this.databaseService.database.categories, this.databaseService.database.flashcards],
+            async () => {
+                await this.databaseService.database.flashcards.where('categoryId').equals(categoryId).delete();
+                if (cards.length > 0) {
+                    await this.databaseService.database.flashcards.bulkAdd(cards);
+                }
+                await this.databaseService.database.categories.put(updatedCategory);
+            }
+        );
+    }
+
     public async delete(id: string): Promise<void> {
         await this.databaseService.database.transaction(
             'rw',
@@ -129,5 +127,50 @@ export class CategoriesService implements ICategoriesService {
                 await this.databaseService.database.categories.delete(id);
             }
         );
+    }
+
+    private async buildCards(
+        categoryId: string,
+        items: IFlashcardItem[],
+        useImages: boolean,
+        onProgress?: (stage: string) => void
+    ): Promise<IFlashcard[]> {
+        const cards: IFlashcard[] = [];
+        const total = items.length;
+        let completedImages = 0;
+        const imageUrls = await mapWithConcurrency(items, IMAGE_CONCURRENCY, async (item) => {
+            if (!useImages) {
+                return [];
+            }
+            let urls: string[] = [];
+            try {
+                urls = await this.imageSearchService.findImages(item);
+            } catch {
+                urls = [];
+            }
+            completedImages += 1;
+            onProgress?.(`Searching images (${completedImages}/${total})...`);
+            return urls;
+        });
+        for (const [index, item] of items.entries()) {
+            cards.push({
+                id: generateId(),
+                categoryId,
+                front: item.front,
+                back: item.back,
+                frontDefinition: item.frontDefinition,
+                backDefinition: item.backDefinition,
+                imageUrl: imageUrls[index]?.[0] ?? null,
+                imageUrl2: imageUrls[index]?.[1] ?? null,
+                level: 0,
+                reviewCount: 0,
+                correctCount: 0,
+                wrongCount: 0,
+                lastReviewedAt: null,
+                nextReviewAt: null,
+                lastResult: null,
+            });
+        }
+        return cards;
     }
 }

@@ -15,5 +15,6 @@ export interface ICategoriesService {
         onProgress?: (stage: string) => void,
         itemCount?: number
     ): Promise<IFlashcardCategory>;
+    resetCategory(categoryId: string, itemCount: number, onProgress?: (stage: string) => void): Promise<void>;
     delete(id: string): Promise<void>;
 }

@@ -25,49 +25,57 @@ const settingsService: ISettingsService = {
 
 const ITEM: IFlashcardItem = { front: 'chemise', back: 'shirt' };
 
-function createProvider(result: string | null): IImageSearchService {
-    return { findFirstImage: jest.fn(async () => result) };
+function createProvider(result: string[]): IImageSearchService {
+    return { findImages: jest.fn(async () => result) };
 }
 
 function createThrowingProvider(): IImageSearchService {
     return {
-        findFirstImage: jest.fn(async () => {
+        findImages: jest.fn(async () => {
             throw new Error('network error');
         }),
     };
 }
 
 describe('ImageSearchService (composite)', () => {
-    it('returns the highest priority non-null result', async () => {
-        const first = createProvider('https://a.example/img.png');
-        const second = createProvider('https://b.example/img.png');
+    it('returns the first two unique urls in priority order', async () => {
+        const first = createProvider(['https://a.example/img.png', 'https://b.example/img.png', 'https://c.example/img.png']);
+        const second = createProvider(['https://d.example/img.png']);
         const service = new ImageSearchService([first, second]);
 
-        await expect(service.findFirstImage(ITEM)).resolves.toBe('https://a.example/img.png');
-        expect(first.findFirstImage).toHaveBeenCalled();
-        expect(second.findFirstImage).toHaveBeenCalled();
+        await expect(service.findImages(ITEM)).resolves.toEqual(['https://a.example/img.png', 'https://b.example/img.png']);
+        expect(first.findImages).toHaveBeenCalled();
+        expect(second.findImages).toHaveBeenCalled();
     });
 
-    it('skips providers that return null', async () => {
-        const first = createProvider(null);
-        const second = createProvider('https://b.example/img.png');
+    it('skips providers that return an empty list', async () => {
+        const first = createProvider([]);
+        const second = createProvider(['https://b.example/img.png']);
         const service = new ImageSearchService([first, second]);
 
-        await expect(service.findFirstImage(ITEM)).resolves.toBe('https://b.example/img.png');
+        await expect(service.findImages(ITEM)).resolves.toEqual(['https://b.example/img.png']);
     });
 
     it('continues when a provider throws', async () => {
         const first = createThrowingProvider();
-        const second = createProvider('https://b.example/img.png');
+        const second = createProvider(['https://b.example/img.png']);
         const service = new ImageSearchService([first, second]);
 
-        await expect(service.findFirstImage(ITEM)).resolves.toBe('https://b.example/img.png');
+        await expect(service.findImages(ITEM)).resolves.toEqual(['https://b.example/img.png']);
     });
 
-    it('returns null when every provider fails', async () => {
-        const service = new ImageSearchService([createProvider(null), createThrowingProvider()]);
+    it('deduplicates urls coming from several providers', async () => {
+        const first = createProvider(['https://a.example/img.png']);
+        const second = createProvider(['https://a.example/img.png', 'https://b.example/img.png']);
+        const service = new ImageSearchService([first, second]);
 
-        await expect(service.findFirstImage(ITEM)).resolves.toBeNull();
+        await expect(service.findImages(ITEM)).resolves.toEqual(['https://a.example/img.png', 'https://b.example/img.png']);
+    });
+
+    it('returns an empty list when every provider fails', async () => {
+        const service = new ImageSearchService([createProvider([]), createThrowingProvider()]);
+
+        await expect(service.findImages(ITEM)).resolves.toEqual([]);
     });
 });
 
@@ -92,7 +100,7 @@ describe('image providers chain', () => {
             json: async () => ({ results: [{ thumbnail: 'https://openverse.example/img.png' }] }),
         });
 
-        await expect(service.findFirstImage(ITEM)).resolves.toBe('https://openverse.example/img.png');
+        await expect(service.findImages(ITEM)).resolves.toEqual(['https://openverse.example/img.png']);
         expect(fetchMock).toHaveBeenCalledTimes(1);
         const openverseUrl = String(fetchMock.mock.calls[0][0]);
         expect(openverseUrl).toContain('api.openverse.org');

@@ -21,7 +21,7 @@ interface IWikiResponse {
 
 @injectable()
 export class WikimediaImageSearchService implements IImageSearchService {
-    public async findFirstImage(item: IFlashcardItem): Promise<string | null> {
+    public async findImages(item: IFlashcardItem): Promise<string[]> {
         const query = item.back ?? item.front;
         const url = new URL(WIKIMEDIA_API_URL);
         url.searchParams.set('action', 'query');
@@ -39,11 +39,15 @@ export class WikimediaImageSearchService implements IImageSearchService {
 
         const response = await fetch(url.toString());
         if (!response.ok) {
-            return null;
+            return [];
         }
         const data = (await response.json()) as IWikiResponse;
-        const page = data.query?.pages?.[0];
-        const info = page?.imageinfo?.[0];
-        return info?.thumburl ?? info?.url ?? null;
+        return (data.query?.pages ?? [])
+            .map((page) => {
+                const info = page.imageinfo?.[0];
+                return info?.thumburl ?? info?.url ?? '';
+            })
+            .filter((imageUrl): imageUrl is string => imageUrl.length > 0)
+            .slice(0, 3);
     }
 }

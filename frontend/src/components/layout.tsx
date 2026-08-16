@@ -15,6 +15,7 @@ import {
     SidebarMenuItem,
     SidebarProvider,
     SidebarTrigger,
+    useSidebar,
 } from './ui/sidebar';
 import { Toaster } from './ui/sonner';
 
@@ -33,6 +34,7 @@ const MENU_ITEMS = [
 
 export const AppSidebar: React.FC = () => {
     const location = useLocation();
+    const { isMobile, setOpenMobile } = useSidebar();
 
     return (
         <Sidebar collapsible="icon">
@@ -52,7 +54,14 @@ export const AppSidebar: React.FC = () => {
                             {MENU_ITEMS.map((item) => (
                                 <SidebarMenuItem key={item.path}>
                                     <SidebarMenuButton asChild isActive={location.pathname === item.path}>
-                                        <NavLink to={item.path}>
+                                        <NavLink
+                                            to={item.path}
+                                            onClick={() => {
+                                                if (isMobile) {
+                                                    setOpenMobile(false);
+                                                }
+                                            }}
+                                        >
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </NavLink>

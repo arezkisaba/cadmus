@@ -19,10 +19,10 @@ interface IUnsplashResponse {
 export class UnsplashImageSearchService implements IImageSearchService {
     public constructor(@inject(DI_CONSTANTS.ISettingsService) private readonly settingsService: ISettingsService) {}
 
-    public async findFirstImage(item: IFlashcardItem): Promise<string | null> {
+    public async findImages(item: IFlashcardItem): Promise<string[]> {
         const settings = this.settingsService.getSettings();
         if (settings.unsplashApiKey.length === 0) {
-            return null;
+            return [];
         }
 
         const url = new URL(CONFIG.UNSPLASH_API_URL);
@@ -35,9 +35,12 @@ export class UnsplashImageSearchService implements IImageSearchService {
             },
         });
         if (!response.ok) {
-            return null;
+            return [];
         }
         const data = (await response.json()) as IUnsplashResponse;
-        return data.results?.[0]?.urls?.small ?? null;
+        return (data.results ?? [])
+            .map((image) => image.urls?.small ?? '')
+            .filter((imageUrl): imageUrl is string => imageUrl.length > 0)
+            .slice(0, 3);
     }
 }
