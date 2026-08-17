@@ -1,11 +1,11 @@
 import { Separator } from '@radix-ui/react-separator';
 import { FolderOpen, Languages, MessagesSquare, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -73,25 +73,6 @@ export const AppSidebar: React.FC = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={location.pathname === '/settings'}>
-                            <NavLink
-                                to="/settings"
-                                onClick={() => {
-                                    if (isMobile) {
-                                        setOpenMobile(false);
-                                    }
-                                }}
-                            >
-                                <Settings />
-                                <span>Settings</span>
-                            </NavLink>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
         </Sidebar>
     );
 };
@@ -131,6 +112,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
                         <h1 className="text-base font-medium">{getPageTitle()}</h1>
                         <div className="ml-auto flex items-center gap-2">
+                            <NavLink to="/settings" aria-label="Settings">
+                                {({ isActive }) => (
+                                    <Button variant={isActive ? 'secondary' : 'ghost'} size="icon" className="cursor-pointer">
+                                        <Settings className="size-4" />
+                                        <span className="sr-only">Settings</span>
+                                    </Button>
+                                )}
+                            </NavLink>
                             <div className="flex justify-end bg-background p-2">
                                 <ThemeToggle />
                             </div>
