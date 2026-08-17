@@ -109,7 +109,7 @@ export const ChatPage: React.FC = () => {
                 )}
             </div>
 
-            <div className="flex shrink-0 items-center gap-2 border-t pt-3 pb-[env(safe-area-inset-bottom)]">
+            <div className="flex shrink-0 items-center gap-2 border-t pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
                 <Input
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
