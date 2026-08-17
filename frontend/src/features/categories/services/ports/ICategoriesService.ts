@@ -1,4 +1,4 @@
-import type { IFlashcardCategory } from '@shared/models/FlashcardModels';
+import type { DifficultyLevel, FlashcardType, IFlashcardCategory } from '@shared/models/FlashcardModels';
 
 export interface ILanguagePair {
     sourceLang: string;
@@ -13,7 +13,9 @@ export interface ICategoriesService {
         prompt: string,
         languagePair: ILanguagePair,
         onProgress?: (stage: string) => void,
-        itemCount?: number
+        itemCount?: number,
+        type?: FlashcardType,
+        difficulty?: DifficultyLevel
     ): Promise<IFlashcardCategory>;
     resetCategory(categoryId: string, itemCount: number, onProgress?: (stage: string) => void): Promise<void>;
     delete(id: string): Promise<void>;

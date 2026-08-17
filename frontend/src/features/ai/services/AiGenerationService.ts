@@ -1,6 +1,7 @@
 import type { IGenerateCategoryRequest, IGenerateCategoryResponse } from '@shared/models/FlashcardModels';
 import { inject, injectable } from 'tsyringe';
 import { DI_CONSTANTS } from '../../../di-constants';
+import type { IAiMessage } from './ai-utils';
 import type { IAiGenerationService } from './ports/IAiGenerationService';
 
 @injectable()
@@ -55,5 +56,26 @@ export class AiGenerationService implements IAiGenerationService {
             throw lastError;
         }
         throw new Error('All AI providers failed to translate the lyrics');
+    }
+
+    public async chat(history: IAiMessage[], sourceLang: string, targetLang: string): Promise<string> {
+        const available = this.providers.filter((provider) => provider.isAvailable());
+        if (available.length === 0) {
+            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen or ChatGPT API key in Settings.');
+        }
+
+        let lastError: unknown = null;
+        for (const provider of available) {
+            try {
+                return await provider.chat(history, sourceLang, targetLang);
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        if (lastError instanceof Error) {
+            throw lastError;
+        }
+        throw new Error('All AI providers failed to answer');
     }
 }

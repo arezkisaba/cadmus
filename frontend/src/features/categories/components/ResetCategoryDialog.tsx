@@ -2,6 +2,7 @@ import type { IFlashcardCategory } from '@shared/models/FlashcardModels';
 import { Loader2, RotateCcw } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -11,6 +12,7 @@ import { DI_CONSTANTS } from '@/di-constants';
 import { getLanguageLabel } from '@/features/settings/models/languages';
 import { useInjection } from '@/hooks/use-container';
 import { CARD_COUNT_OPTIONS, DEFAULT_CARD_COUNT } from '../card-count';
+import { getDifficultyLabel, getFlashcardTypeLabel } from '../flashcard-types';
 import type { ICategoriesService } from '../services/ports/ICategoriesService';
 
 interface IResetCategoryDialogProps {
@@ -31,7 +33,7 @@ export const ResetCategoryDialog: React.FC<IResetCategoryDialogProps> = ({ categ
             return;
         }
         setLoading(true);
-        setProgressText('Generating vocabulary with AI...');
+        setProgressText('Regenerating cards with AI...');
         try {
             await categoriesService.resetCategory(category.id, cardCount, (stage) => setProgressText(stage));
             toast.success('Category reset');
@@ -62,7 +64,7 @@ export const ResetCategoryDialog: React.FC<IResetCategoryDialogProps> = ({ categ
                         Reset category
                     </DialogTitle>
                     <DialogDescription>
-                        Regenerates the vocabulary with AI, which resets all progress and flashcards. You can pick a new number of cards.
+                        Regenerates the cards with AI, which resets all progress and flashcards. You can pick a new number of cards.
                     </DialogDescription>
                 </DialogHeader>
                 {category !== null && category !== undefined && (
@@ -70,9 +72,17 @@ export const ResetCategoryDialog: React.FC<IResetCategoryDialogProps> = ({ categ
                         <div className="flex flex-col gap-1 rounded-lg border p-3 text-sm">
                             <span className="font-semibold">{category.name}</span>
                             <span className="text-muted-foreground italic">"{category.prompt}"</span>
-                            <span className="text-muted-foreground mt-1 font-mono text-xs">
-                                {getLanguageLabel(category.sourceLang)} → {getLanguageLabel(category.targetLang)}
-                            </span>
+                            <div className="mt-1 flex flex-wrap items-center gap-2">
+                                <Badge variant="secondary" className="font-mono text-xs">
+                                    {getFlashcardTypeLabel(category.type)}
+                                </Badge>
+                                <Badge variant="outline" className="font-mono text-xs">
+                                    {getDifficultyLabel(category.difficulty)}
+                                </Badge>
+                                <span className="text-muted-foreground font-mono text-xs">
+                                    {getLanguageLabel(category.sourceLang)} → {getLanguageLabel(category.targetLang)}
+                                </span>
+                            </div>
                         </div>
                         <div className="flex flex-col gap-2 sm:max-w-[14rem]">
                             <Label htmlFor="reset-card-count">Number of cards</Label>

@@ -1,9 +1,19 @@
-import type { IFlashcard } from '@shared/models/FlashcardModels';
-import { Check, Eye, History, Languages, Volume2, X } from 'lucide-react';
+import type { FlashcardType, IFlashcard } from '@shared/models/FlashcardModels';
+import { BookOpen, Check, Eye, History, Languages, MessageSquare, Sigma, Sparkles, Volume2, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { speak } from '@/features/_shared/utils/speech';
+
+const TYPE_ICONS: Record<FlashcardType, React.ComponentType<{ className?: string }>> = {
+    word: Languages,
+    expression: Sparkles,
+    grammar: BookOpen,
+    phrase: MessageSquare,
+    conjugation: Sigma,
+};
+
+const IMAGE_TYPES: ReadonlySet<FlashcardType> = new Set(['word']);
 
 interface IFlashcardCardProps {
     card: IFlashcard;
@@ -31,6 +41,54 @@ const CardStats: React.FC<{ card: IFlashcard }> = ({ card }) => (
         </Badge>
     </div>
 );
+
+const TypeImage: React.FC<{ card: IFlashcard; displayImage: string | null }> = ({ card, displayImage }) => {
+    const type = card.type ?? 'word';
+    const Icon = TYPE_ICONS[type];
+    if (IMAGE_TYPES.has(type) && displayImage !== null) {
+        return (
+            <img
+                src={displayImage}
+                alt={card.front}
+                className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
+                decoding="async"
+            />
+        );
+    }
+    return (
+        <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl border border-gray-200 dark:border-gray-700">
+            <Icon className="size-10" />
+        </div>
+    );
+};
+
+const CardFront: React.FC<{ card: IFlashcard; displayImage: string | null }> = ({ card, displayImage }) => {
+    const type = card.type ?? 'word';
+    return (
+        <div className="flex flex-col items-center gap-3">
+            <TypeImage card={card} displayImage={displayImage} />
+            <span className={`text-center text-3xl font-bold ${type === 'conjugation' ? 'text-2xl' : ''}`}>{card.front}</span>
+            {card.frontDefinition !== undefined && card.frontDefinition.length > 0 && (
+                <span className="text-muted-foreground max-w-sm text-center text-sm">{card.frontDefinition}</span>
+            )}
+        </div>
+    );
+};
+
+const CardBack: React.FC<{ card: IFlashcard; displayImage: string | null }> = ({ card, displayImage }) => {
+    const type = card.type ?? 'word';
+    return (
+        <div className="flex flex-col items-center gap-3">
+            <TypeImage card={card} displayImage={displayImage} />
+            <span className={`text-primary text-center text-3xl font-bold ${type === 'conjugation' ? 'whitespace-pre-line text-2xl' : ''}`}>
+                {card.back}
+            </span>
+            {card.backDefinition !== undefined && card.backDefinition.length > 0 && (
+                <span className="text-muted-foreground max-w-sm text-center text-sm">{card.backDefinition}</span>
+            )}
+        </div>
+    );
+};
 
 export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang, targetLang, onAnswer }) => {
     const [flipped, setFlipped] = useState(false);
@@ -60,24 +118,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                 <div className="flip-card-face bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-5 shadow-lg">
                     <CardStats card={card} />
                     <div className="flex flex-1 flex-col items-center justify-center gap-4">
-                        <div className="flex flex-col items-center gap-3">
-                            {displayImage ? (
-                                <img
-                                    src={displayImage}
-                                    alt={card.front}
-                                    className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
-                                    decoding="async"
-                                />
-                            ) : (
-                                <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl border border-gray-200 dark:border-gray-700">
-                                    <Languages className="size-10" />
-                                </div>
-                            )}
-                            <span className="text-center text-3xl font-bold">{card.front}</span>
-                            {card.frontDefinition !== undefined && card.frontDefinition.length > 0 && (
-                                <span className="text-muted-foreground max-w-sm text-center text-sm">{card.frontDefinition}</span>
-                            )}
-                        </div>
+                        <CardFront card={card} displayImage={displayImage} />
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
@@ -100,24 +141,7 @@ export const FlashcardCard: React.FC<IFlashcardCardProps> = ({ card, sourceLang,
                 <div className="flip-card-face flip-card-back bg-card border-border absolute inset-0 flex flex-col rounded-3xl border p-5 shadow-lg">
                     <CardStats card={card} />
                     <div className="flex flex-1 flex-col items-center justify-center gap-4">
-                        <div className="flex flex-col items-center gap-3">
-                            {displayImage ? (
-                                <img
-                                    src={displayImage}
-                                    alt={card.back}
-                                    className="h-32 w-32 rounded-2xl border border-gray-200 object-cover dark:border-gray-700"
-                                    decoding="async"
-                                />
-                            ) : (
-                                <div className="bg-muted text-muted-foreground flex h-32 w-32 items-center justify-center rounded-2xl border border-gray-200 dark:border-gray-700">
-                                    <Languages className="size-10" />
-                                </div>
-                            )}
-                            <span className="text-primary text-center text-3xl font-bold">{card.back}</span>
-                            {card.backDefinition !== undefined && card.backDefinition.length > 0 && (
-                                <span className="text-muted-foreground max-w-sm text-center text-sm">{card.backDefinition}</span>
-                            )}
-                        </div>
+                        <CardBack card={card} displayImage={displayImage} />
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"

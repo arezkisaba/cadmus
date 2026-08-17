@@ -1,3 +1,4 @@
+import type { DifficultyLevel, FlashcardType } from '@shared/models/FlashcardModels';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -12,6 +13,7 @@ import { LANGUAGES } from '@/features/settings/models/languages';
 import type { ISettingsService } from '@/features/settings/services/ports/ISettingsService';
 import { useInjection } from '@/hooks/use-container';
 import { CARD_COUNT_OPTIONS, DEFAULT_CARD_COUNT } from '../card-count';
+import { DIFFICULTY_LEVELS, FLASHCARD_TYPES } from '../flashcard-types';
 import type { ICategoriesService } from '../services/ports/ICategoriesService';
 
 interface ICreateCategoryDialogProps {
@@ -19,14 +21,14 @@ interface ICreateCategoryDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-const EXAMPLE_PROMPTS = ['les vêtements de tous les jours', 'la nourriture au restaurant'];
-
 export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ open, onOpenChange }) => {
     const categoriesService = useInjection<ICategoriesService>(DI_CONSTANTS.ICategoriesService);
     const settingsService = useInjection<ISettingsService>(DI_CONSTANTS.ISettingsService);
     const initialSettings = settingsService.getSettings();
     const [prompt, setPrompt] = useState('');
     const [cardCount, setCardCount] = useState(DEFAULT_CARD_COUNT);
+    const [contentType, setContentType] = useState<FlashcardType>('word');
+    const [difficulty, setDifficulty] = useState<DifficultyLevel>('beginner');
     const [sourceLang, setSourceLang] = useState(initialSettings.sourceLang);
     const [targetLang, setTargetLang] = useState(initialSettings.targetLang);
     const [loading, setLoading] = useState(false);
@@ -38,9 +40,16 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
             return;
         }
         setLoading(true);
-        setProgressText('Generating vocabulary with AI...');
+        setProgressText(`Generating ${contentType} cards with AI...`);
         try {
-            await categoriesService.createFromPrompt(trimmed, { sourceLang, targetLang }, (stage) => setProgressText(stage), cardCount);
+            await categoriesService.createFromPrompt(
+                trimmed,
+                { sourceLang, targetLang },
+                (stage) => setProgressText(stage),
+                cardCount,
+                contentType,
+                difficulty
+            );
             toast.success('Category created');
             setPrompt('');
             onOpenChange(false);
@@ -50,7 +59,7 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
         } finally {
             setLoading(false);
         }
-    }, [prompt, sourceLang, targetLang, cardCount, categoriesService, onOpenChange]);
+    }, [prompt, sourceLang, targetLang, cardCount, contentType, difficulty, categoriesService, onOpenChange]);
 
     const handleOpenChange = useCallback(
         (next: boolean): void => {
@@ -72,7 +81,7 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
                     <DialogDescription>Describe a theme, AI builds a list of flashcards in the language pair of your choice.</DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="dialog-source-lang">Source language</Label>
                             <Select
@@ -104,40 +113,63 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
                             </Select>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-2 sm:max-w-[14rem]">
-                        <Label htmlFor="dialog-card-count">Number of cards</Label>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="dialog-content-type">Content type</Label>
                         <Select
-                            id="dialog-card-count"
-                            value={String(cardCount)}
-                            onChange={(event) => setCardCount(Number(event.target.value))}
+                            id="dialog-content-type"
+                            value={contentType}
+                            onChange={(event) => setContentType(event.target.value as FlashcardType)}
                             disabled={loading}
                         >
-                            {CARD_COUNT_OPTIONS.map((count) => (
-                                <option key={count} value={count}>
-                                    {count} cards
+                            {FLASHCARD_TYPES.map((type) => (
+                                <option key={type.value} value={type.value}>
+                                    {type.label}
                                 </option>
                             ))}
                         </Select>
                     </div>
-                    <Textarea
-                        value={prompt}
-                        onChange={(event) => setPrompt(event.target.value)}
-                        placeholder='e.g. "les vêtements de tous les jours"'
-                        disabled={loading}
-                        rows={3}
-                    />
-                    <div className="flex flex-wrap gap-2">
-                        {EXAMPLE_PROMPTS.map((example) => (
-                            <button
-                                key={example}
-                                type="button"
-                                onClick={() => setPrompt(example)}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="dialog-difficulty">Difficulty</Label>
+                            <Select
+                                id="dialog-difficulty"
+                                value={difficulty}
+                                onChange={(event) => setDifficulty(event.target.value as DifficultyLevel)}
                                 disabled={loading}
-                                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-full border px-3 py-1 text-xs transition-colors disabled:opacity-50"
                             >
-                                {example}
-                            </button>
-                        ))}
+                                {DIFFICULTY_LEVELS.map((level) => (
+                                    <option key={level.value} value={level.value}>
+                                        {level.label}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="dialog-card-count">Number of cards</Label>
+                            <Select
+                                id="dialog-card-count"
+                                value={String(cardCount)}
+                                onChange={(event) => setCardCount(Number(event.target.value))}
+                                disabled={loading}
+                            >
+                                {CARD_COUNT_OPTIONS.map((count) => (
+                                    <option key={count} value={count}>
+                                        {count} cards
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="dialog-prompt">Category description</Label>
+                        <Textarea
+                            id="dialog-prompt"
+                            value={prompt}
+                            onChange={(event) => setPrompt(event.target.value)}
+                            placeholder='e.g. "les vêtements de tous les jours"'
+                            disabled={loading}
+                            rows={3}
+                        />
                     </div>
                     {loading && (
                         <div className="flex flex-col gap-2">

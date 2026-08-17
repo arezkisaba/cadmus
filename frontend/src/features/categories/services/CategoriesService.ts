@@ -1,4 +1,11 @@
-import type { IFlashcard, IFlashcardCategory, IFlashcardItem, IGenerateCategoryRequest } from '@shared/models/FlashcardModels';
+import type {
+    DifficultyLevel,
+    FlashcardType,
+    IFlashcard,
+    IFlashcardCategory,
+    IFlashcardItem,
+    IGenerateCategoryRequest,
+} from '@shared/models/FlashcardModels';
 import { inject, injectable } from 'tsyringe';
 import { DI_CONSTANTS } from '../../../di-constants';
 import type { DatabaseService } from '../../_shared/services/DatabaseService';
@@ -10,6 +17,14 @@ import type { ISettingsService } from '../../settings/services/ports/ISettingsSe
 import type { ICategoriesService, ILanguagePair } from './ports/ICategoriesService';
 
 const IMAGE_CONCURRENCY = 5;
+const IMAGE_TYPES: ReadonlySet<FlashcardType> = new Set(['word']);
+
+const ARTICLE_REGEX =
+    /^(?:(?:the|a|an|le|la|les|un|une|des|el|los|las|der|die|das|ein|eine|einen|il|lo|i|gli|uno|una|o|os|as|um|uma|de|het|een|en|ett)\s+)+/i;
+
+export function stripLeadingArticle(text: string): string {
+    return text.replace(ARTICLE_REGEX, '').trim();
+}
 
 @injectable()
 export class CategoriesService implements ICategoriesService {
@@ -44,7 +59,9 @@ export class CategoriesService implements ICategoriesService {
         prompt: string,
         languagePair: ILanguagePair,
         onProgress?: (stage: string) => void,
-        itemCount?: number
+        itemCount?: number,
+        type: FlashcardType = 'word',
+        difficulty: DifficultyLevel = 'beginner'
     ): Promise<IFlashcardCategory> {
         const settings = this.settingsService.getSettings();
         const request: IGenerateCategoryRequest = {
@@ -52,8 +69,10 @@ export class CategoriesService implements ICategoriesService {
             sourceLang: languagePair.sourceLang,
             targetLang: languagePair.targetLang,
             ...(itemCount !== undefined ? { itemCount } : {}),
+            type,
+            difficulty,
         };
-        onProgress?.('Generating vocabulary with AI...');
+        onProgress?.(`Generating ${type} cards with AI...`);
         const result = await this.aiGenerationService.generateCategory(request);
 
         const categoryId = generateId();
@@ -67,10 +86,12 @@ export class CategoriesService implements ICategoriesService {
             targetLang: languagePair.targetLang,
             createdAt: now,
             sessionCount: 0,
+            type,
+            difficulty,
         };
 
         const useImages = settings.useImages;
-        const cards = await this.buildCards(categoryId, result.items, useImages, onProgress);
+        const cards = await this.buildCards(categoryId, result.items, useImages, onProgress, type);
 
         await this.databaseService.database.transaction(
             'rw',
@@ -91,18 +112,24 @@ export class CategoriesService implements ICategoriesService {
         if (category === undefined) {
             return;
         }
+        const type = category.type ?? 'word';
+        const difficulty = category.difficulty ?? 'beginner';
         const request: IGenerateCategoryRequest = {
             prompt: category.prompt,
             sourceLang: category.sourceLang,
             targetLang: category.targetLang,
             itemCount,
+            type,
+            difficulty,
         };
-        onProgress?.('Generating vocabulary with AI...');
+        onProgress?.(`Generating ${type} cards with AI...`);
         const result = await this.aiGenerationService.generateCategory(request);
         const settings = this.settingsService.getSettings();
-        const cards = await this.buildCards(categoryId, result.items, settings.useImages, onProgress);
+        const cards = await this.buildCards(categoryId, result.items, settings.useImages, onProgress, type);
         const updatedCategory: IFlashcardCategory = {
             ...category,
+            type,
+            difficulty,
             sessionCount: 0,
         };
         await this.databaseService.database.transaction(
@@ -133,13 +160,15 @@ export class CategoriesService implements ICategoriesService {
         categoryId: string,
         items: IFlashcardItem[],
         useImages: boolean,
-        onProgress?: (stage: string) => void
+        onProgress?: (stage: string) => void,
+        type: FlashcardType = 'word'
     ): Promise<IFlashcard[]> {
         const cards: IFlashcard[] = [];
         const total = items.length;
         let completedImages = 0;
+        const wantsImages = useImages && IMAGE_TYPES.has(type);
         const imageUrls = await mapWithConcurrency(items, IMAGE_CONCURRENCY, async (item) => {
-            if (!useImages) {
+            if (!wantsImages) {
                 return [];
             }
             let urls: string[] = [];
@@ -153,13 +182,23 @@ export class CategoriesService implements ICategoriesService {
             return urls;
         });
         for (const [index, item] of items.entries()) {
+            const isWord = type === 'word';
+            const clean = (text: string): string => {
+                if (!isWord) {
+                    return text;
+                }
+                const stripped = stripLeadingArticle(text);
+                return stripped.length > 0 ? stripped : text;
+            };
             cards.push({
                 id: generateId(),
                 categoryId,
-                front: item.front,
-                back: item.back,
+                front: clean(item.front),
+                back: clean(item.back),
                 frontDefinition: item.frontDefinition,
                 backDefinition: item.backDefinition,
+                exampleSource: item.exampleSource,
+                exampleTarget: item.exampleTarget,
                 imageUrl: imageUrls[index]?.[0] ?? null,
                 imageUrl2: imageUrls[index]?.[1] ?? null,
                 level: 0,
@@ -169,6 +208,7 @@ export class CategoriesService implements ICategoriesService {
                 lastReviewedAt: null,
                 nextReviewAt: null,
                 lastResult: null,
+                type,
             });
         }
         return cards;

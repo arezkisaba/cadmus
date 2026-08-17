@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Progress } from '@/components/ui/progress';
 import { getLanguageLabel } from '@/features/settings/models/languages';
 import type { ICategoryStats } from '../../flashcards/services/ports/IFlashcardService';
+import { getDifficultyLabel, getFlashcardTypeLabel } from '../flashcard-types';
 
 interface ICategoryCardProps {
     category: IFlashcardCategory;
@@ -54,6 +55,12 @@ export const CategoryCard: React.FC<ICategoryCardProps> = ({ category, stats, on
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="font-mono text-xs">
+                        {getFlashcardTypeLabel(category.type)}
+                    </Badge>
+                    <Badge variant="outline" className="font-mono text-xs">
+                        {getDifficultyLabel(category.difficulty)}
+                    </Badge>
                     <Badge variant="secondary" className="font-mono text-xs">
                         {getLanguageLabel(category.sourceLang)} → {getLanguageLabel(category.targetLang)}
                     </Badge>

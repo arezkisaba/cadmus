@@ -3,6 +3,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Layout } from './components/layout';
 import { ThemeProvider } from './components/theme-provider';
 import { CategoriesPage } from './features/categories/pages/CategoriesPage';
+import { ChatPage } from './features/chat/pages/ChatPage';
 import { FlashcardReviewPage } from './features/flashcards/pages/FlashcardReviewPage';
 import { MistakesPage } from './features/flashcards/pages/MistakesPage';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
@@ -18,6 +19,7 @@ export const App: React.FC = () => {
                         <Route path="/" element={<CategoriesPage />} />
                         <Route path="/review/:categoryId" element={<FlashcardReviewPage />} />
                         <Route path="/mistakes" element={<MistakesPage />} />
+                        <Route path="/chat" element={<ChatPage />} />
                         <Route path="/songs" element={<SongsPage />} />
                         <Route path="/songs/:trackId" element={<SongDetailPage />} />
                         <Route path="/settings" element={<SettingsPage />} />

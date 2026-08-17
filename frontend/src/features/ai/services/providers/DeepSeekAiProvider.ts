@@ -3,7 +3,15 @@ import type { IGenerateCategoryRequest, IGenerateCategoryResponse } from '@share
 import { inject, injectable } from 'tsyringe';
 import { DI_CONSTANTS } from '../../../../di-constants';
 import type { ISettingsService } from '../../../settings/services/ports/ISettingsService';
-import { buildCategoryMessages, buildSongTranslationMessages, callChatCompletions, parseCategoryResponse, parseSongTranslation } from '../ai-utils';
+import type { IAiMessage } from '../ai-utils';
+import {
+    buildCategoryMessages,
+    buildChatMessages,
+    buildSongTranslationMessages,
+    callChatCompletions,
+    parseCategoryResponse,
+    parseSongTranslation,
+} from '../ai-utils';
 import type { IAiGenerationService } from '../ports/IAiGenerationService';
 
 @injectable()
@@ -45,5 +53,19 @@ export class DeepSeekAiProvider implements IAiGenerationService {
             console.warn('[Song translation] could not parse response:', content.slice(0, 500));
         }
         return translations;
+    }
+
+    public async chat(history: IAiMessage[], sourceLang: string, targetLang: string): Promise<string> {
+        const apiKey = this.settingsService.getSettings().deepseekApiKey;
+        const content = await callChatCompletions(
+            CONFIG.DEEPSEEK_API_URL,
+            CONFIG.DEEPSEEK_MODEL,
+            apiKey,
+            buildChatMessages(history, sourceLang, targetLang),
+            'DeepSeek',
+            false,
+            true
+        );
+        return content.trim();
     }
 }

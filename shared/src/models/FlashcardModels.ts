@@ -1,3 +1,7 @@
+export type FlashcardType = 'word' | 'expression' | 'grammar' | 'phrase' | 'conjugation';
+
+export type DifficultyLevel = 'beginner' | 'elementary' | 'intermediate' | 'upper-intermediate' | 'advanced';
+
 export interface IFlashcardCategory {
     id: string;
     name: string;
@@ -7,6 +11,8 @@ export interface IFlashcardCategory {
     targetLang: string;
     createdAt: number;
     sessionCount?: number;
+    type?: FlashcardType;
+    difficulty?: DifficultyLevel;
 }
 
 export interface IFlashcard {
@@ -16,6 +22,8 @@ export interface IFlashcard {
     back: string;
     frontDefinition?: string;
     backDefinition?: string;
+    exampleSource?: string;
+    exampleTarget?: string;
     imageUrl: string | null;
     imageUrl2?: string | null;
     level: number;
@@ -25,6 +33,7 @@ export interface IFlashcard {
     lastReviewedAt: number | null;
     nextReviewAt: number | null;
     lastResult?: boolean | null;
+    type?: FlashcardType;
 }
 
 export interface IAppSettings {
@@ -44,6 +53,8 @@ export interface IFlashcardItem {
     back: string;
     frontDefinition?: string;
     backDefinition?: string;
+    exampleSource?: string;
+    exampleTarget?: string;
 }
 
 export interface IGenerateCategoryRequest {
@@ -52,6 +63,8 @@ export interface IGenerateCategoryRequest {
     targetLang: string;
     categoryName?: string;
     itemCount?: number;
+    type?: FlashcardType;
+    difficulty?: DifficultyLevel;
 }
 
 export interface IGenerateCategoryResponse {

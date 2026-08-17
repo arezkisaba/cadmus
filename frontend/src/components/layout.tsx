@@ -1,10 +1,11 @@
 import { Separator } from '@radix-ui/react-separator';
-import { FolderOpen, Languages, Music, Settings, XCircle } from 'lucide-react';
+import { FolderOpen, Languages, MessagesSquare, Settings, XCircle } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './theme-toggle';
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -31,14 +32,9 @@ const MENU_ITEMS = [
         path: '/mistakes',
     },
     {
-        title: 'Songs',
-        icon: Music,
-        path: '/songs',
-    },
-    {
-        title: 'Settings',
-        icon: Settings,
-        path: '/settings',
+        title: 'Chat',
+        icon: MessagesSquare,
+        path: '/chat',
     },
 ] as const;
 
@@ -82,6 +78,25 @@ export const AppSidebar: React.FC = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={location.pathname === '/settings'}>
+                            <NavLink
+                                to="/settings"
+                                onClick={() => {
+                                    if (isMobile) {
+                                        setOpenMobile(false);
+                                    }
+                                }}
+                            >
+                                <Settings />
+                                <span>Settings</span>
+                            </NavLink>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarFooter>
         </Sidebar>
     );
 };
@@ -101,6 +116,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         }
         if (location.pathname.startsWith('/songs')) {
             return 'Songs';
+        }
+        if (location.pathname.startsWith('/chat')) {
+            return 'Chat';
         }
         return 'Categories';
     };
@@ -123,7 +141,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </div>
                     </div>
                 </header>
-                <main className="p-6 w-full">{children}</main>
+                <main className="flex-1 min-h-0 w-full overflow-y-auto p-6">{children}</main>
                 <div style={{ height: 'env(safe-area-inset-bottom)' }} />
             </SidebarInset>
         </SidebarProvider>
