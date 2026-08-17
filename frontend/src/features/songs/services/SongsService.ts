@@ -90,7 +90,7 @@ export class SongsService implements ISongsService {
         const cacheId = `lyrics:${song.trackId}:${sourceLang}:${targetLang}`;
         if (!force) {
             const cached = await this.databaseService.database.songCache.get(cacheId);
-            if (cached !== undefined && cached.kind === 'lyrics') {
+            if (cached !== undefined && cached.kind === 'lyrics' && this.hasTranslation(cached.data)) {
                 return cached.data as ISongLyrics;
             }
         }
@@ -112,9 +112,19 @@ export class SongsService implements ISongsService {
         }
 
         onProgress?.('Translating lyrics with AI...');
-        const translations = await this.aiGenerationService.translateSongLyrics(lyrics, sourceLang, targetLang);
-
         const originalLines = lyrics.split('\n');
+        const translations: string[] = [];
+        const CHUNK_LINES = 30;
+        for (let offset = 0; offset < originalLines.length; offset += CHUNK_LINES) {
+            const chunk = originalLines.slice(offset, offset + CHUNK_LINES).join('\n');
+            onProgress?.(`Translating lyrics (lines ${offset + 1}-${Math.min(offset + CHUNK_LINES, originalLines.length)})...`);
+            const chunkTranslations = await this.aiGenerationService.translateSongLyrics(chunk, sourceLang, targetLang);
+            translations.push(...chunkTranslations);
+        }
+        if (translations.length === 0) {
+            throw new Error('The AI did not return any translation, please try again');
+        }
+
         const lines = originalLines
             .map((original, index) => ({
                 original: original.trim(),
@@ -151,5 +161,9 @@ export class SongsService implements ISongsService {
             artworkUrl: track.artworkUrl100,
             previewUrl: track.previewUrl,
         };
+    }
+
+    private hasTranslation(lyrics: ISongLyrics | ISongSearchResult): lyrics is ISongLyrics {
+        return 'lines' in lyrics && lyrics.lines.some((line) => line.translation.length > 0);
     }
 }

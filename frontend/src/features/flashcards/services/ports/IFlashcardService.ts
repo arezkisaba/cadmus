@@ -15,6 +15,7 @@ export interface IFlashcardService {
     getCountByCategory(categoryId: string): Promise<number>;
     getDueCount(categoryId: string): Promise<number>;
     getStatsByCategory(categoryId: string): Promise<ICategoryStats>;
+    getWrongCards(): Promise<IFlashcard[]>;
     answer(card: IFlashcard, correct: boolean): Promise<IFlashcard>;
     reset(card: IFlashcard): Promise<void>;
 }

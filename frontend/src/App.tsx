@@ -4,6 +4,7 @@ import { Layout } from './components/layout';
 import { ThemeProvider } from './components/theme-provider';
 import { CategoriesPage } from './features/categories/pages/CategoriesPage';
 import { FlashcardReviewPage } from './features/flashcards/pages/FlashcardReviewPage';
+import { MistakesPage } from './features/flashcards/pages/MistakesPage';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { SongDetailPage } from './features/songs/pages/SongDetailPage';
 import { SongsPage } from './features/songs/pages/SongsPage';
@@ -16,6 +17,7 @@ export const App: React.FC = () => {
                     <Routes>
                         <Route path="/" element={<CategoriesPage />} />
                         <Route path="/review/:categoryId" element={<FlashcardReviewPage />} />
+                        <Route path="/mistakes" element={<MistakesPage />} />
                         <Route path="/songs" element={<SongsPage />} />
                         <Route path="/songs/:trackId" element={<SongDetailPage />} />
                         <Route path="/settings" element={<SettingsPage />} />

@@ -117,6 +117,19 @@ describe('DeepSeekAiProvider', () => {
         expect(result.items[0].front).toBe('chemise');
     });
 
+    it('disables thinking mode in the request body', async () => {
+        fetchMock.mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                choices: [{ message: { content: JSON.stringify({ categoryName: 'Clothes', items: [{ front: 'chemise', back: 'shirt' }] }) } }],
+            }),
+        });
+        await provider.generateCategory(REQUEST);
+        const init = fetchMock.mock.calls[0][1] as { body?: string };
+        const body = JSON.parse(init.body ?? '{}') as { thinking?: { type?: string } };
+        expect(body.thinking).toEqual({ type: 'disabled' });
+    });
+
     it('extracts JSON from markdown-wrapped content', async () => {
         fetchMock.mockResolvedValue({
             ok: true,

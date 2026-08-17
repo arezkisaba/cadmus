@@ -30,6 +30,11 @@ export class QwenAiProvider implements IAiGenerationService {
             'Qwen',
             false
         );
-        return parseSongTranslation(content);
+        console.log('[Song translation] raw response:', content);
+        const translations = parseSongTranslation(content);
+        if (translations.length === 0) {
+            console.warn('[Song translation] could not parse response:', content.slice(0, 500));
+        }
+        return translations;
     }
 }

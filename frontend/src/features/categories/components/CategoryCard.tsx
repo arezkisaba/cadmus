@@ -1,5 +1,5 @@
 import type { IFlashcardCategory } from '@shared/models/FlashcardModels';
-import { ArrowRight, Layers, Repeat, RotateCcw, Trash2 } from 'lucide-react';
+import { Layers, Play, Repeat, RotateCcw, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -80,8 +80,8 @@ export const CategoryCard: React.FC<ICategoryCardProps> = ({ category, stats, on
             </CardContent>
             <CardFooter>
                 <Button className="w-full" onClick={() => onReview(category.id)}>
-                    Review
-                    <ArrowRight />
+                    <Play />
+                    Play
                 </Button>
             </CardFooter>
         </Card>

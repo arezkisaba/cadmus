@@ -64,6 +64,11 @@ export class FlashcardsService implements IFlashcardService {
         };
     }
 
+    public async getWrongCards(): Promise<IFlashcard[]> {
+        const all = await this.databaseService.database.flashcards.toArray();
+        return all.filter((card) => card.lastResult === false);
+    }
+
     public async answer(card: IFlashcard, correct: boolean): Promise<IFlashcard> {
         const updated = computeAnswerResult(card, correct, Date.now());
         await this.databaseService.database.flashcards.put(updated);
