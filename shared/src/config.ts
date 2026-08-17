@@ -7,6 +7,8 @@ export const CONFIG = {
     QWEN_MODEL: 'qwen-turbo',
     CHATGPT_API_URL: 'https://api.openai.com/v1/chat/completions',
     CHATGPT_MODEL: 'gpt-4o-mini',
+    ANTHROPIC_API_URL: 'https://api.anthropic.com/v1/messages',
+    ANTHROPIC_MODEL: 'claude-sonnet-4-5',
     PIXABAY_API_URL: 'https://pixabay.com/api/',
     PEXELS_API_URL: 'https://api.pexels.com/v1/search',
     UNSPLASH_API_URL: 'https://api.unsplash.com/search/photos',

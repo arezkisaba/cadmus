@@ -163,7 +163,7 @@ function Sidebar({
                     data-sidebar="sidebar"
                     data-slot="sidebar"
                     data-mobile="true"
-                    className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+                    className="bg-sidebar text-sidebar-foreground h-svh w-(--sidebar-width) p-0 [&>button]:hidden"
                     style={
                         {
                             '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
@@ -175,7 +175,7 @@ function Sidebar({
                         <SheetTitle>Sidebar</SheetTitle>
                         <SheetDescription>Displays the mobile sidebar.</SheetDescription>
                     </SheetHeader>
-                    <div className="flex h-full w-full flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">{children}</div>
+                    <div className="flex h-svh w-full flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">{children}</div>
                 </SheetContent>
             </Sheet>
         );
@@ -204,7 +204,7 @@ function Sidebar({
                 )}
                 {...props}
             >
-                <div data-sidebar="sidebar" data-slot="sidebar-inner" className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm">
+                <div data-sidebar="sidebar" data-slot="sidebar-inner" className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-svh w-full flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm">
                     {children}
                 </div>
             </div>
@@ -282,7 +282,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 function SidebarFooter({ className, ...props }: React.ComponentProps<'div'>) {
-    return <div data-slot="sidebar-footer" data-sidebar="footer" className={cn('flex flex-col gap-2 p-2', className)} {...props} />;
+    return <div data-slot="sidebar-footer" data-sidebar="footer" className={cn('mt-auto flex flex-col gap-2 p-2', className)} {...props} />;
 }
 
 function SidebarSeparator({ className, ...props }: React.ComponentProps<typeof Separator>) {

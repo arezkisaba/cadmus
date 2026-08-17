@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'cadmus-v5';
+const CACHE_VERSION = 'cadmus-v7';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const IMAGE_HOSTS = ['images.pixabay.com', 'api.openverse.org', 'upload.wikimedia.org', 'commons.wikimedia.org'];

@@ -5,6 +5,7 @@ export const DI_CONSTANTS = {
     IDeepSeekAiProvider: 'IDeepSeekAiProvider',
     IQwenAiProvider: 'IQwenAiProvider',
     IChatGptAiProvider: 'IChatGptAiProvider',
+    IClaudeAiProvider: 'IClaudeAiProvider',
     IAiProviders: 'IAiProviders',
     IImageSearchService: 'IImageSearchService',
     IPixabayImageSearchService: 'IPixabayImageSearchService',

@@ -15,7 +15,7 @@ export class AiGenerationService implements IAiGenerationService {
     public async generateCategory(request: IGenerateCategoryRequest): Promise<IGenerateCategoryResponse> {
         const available = this.providers.filter((provider) => provider.isAvailable());
         if (available.length === 0) {
-            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen or ChatGPT API key in Settings.');
+            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen, ChatGPT or Claude API key in Settings.');
         }
 
         let lastError: unknown = null;
@@ -40,7 +40,7 @@ export class AiGenerationService implements IAiGenerationService {
     public async translateSongLyrics(lyrics: string, sourceLang: string, targetLang: string): Promise<string[]> {
         const available = this.providers.filter((provider) => provider.isAvailable());
         if (available.length === 0) {
-            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen or ChatGPT API key in Settings.');
+            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen, ChatGPT or Claude API key in Settings.');
         }
 
         let lastError: unknown = null;
@@ -61,7 +61,7 @@ export class AiGenerationService implements IAiGenerationService {
     public async chat(history: IAiMessage[], sourceLang: string, targetLang: string): Promise<string> {
         const available = this.providers.filter((provider) => provider.isAvailable());
         if (available.length === 0) {
-            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen or ChatGPT API key in Settings.');
+            throw new Error('No AI provider is configured. Add a DeepSeek, Qwen, ChatGPT or Claude API key in Settings.');
         }
 
         let lastError: unknown = null;

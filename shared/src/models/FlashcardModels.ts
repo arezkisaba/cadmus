@@ -40,6 +40,7 @@ export interface IAppSettings {
     deepseekApiKey: string;
     qwenApiKey: string;
     chatGptApiKey: string;
+    claudeApiKey: string;
     pixabayApiKey: string;
     pexelsApiKey: string;
     unsplashApiKey: string;

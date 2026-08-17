@@ -10,6 +10,7 @@ const SETTINGS: IAppSettings = {
     deepseekApiKey: '',
     qwenApiKey: '',
     chatGptApiKey: '',
+    claudeApiKey: '',
     pixabayApiKey: '',
     pexelsApiKey: '',
     unsplashApiKey: '',

@@ -151,6 +151,42 @@ export async function callChatCompletions(
     return data.choices?.[0]?.message?.content ?? '';
 }
 
+export async function callAnthropic(url: string, model: string, apiKey: string, messages: IAiMessage[], providerName: string): Promise<string> {
+    const system = messages
+        .filter((message) => message.role === 'system')
+        .map((message) => message.content)
+        .join('\n');
+    const chatMessages = messages.filter((message) => message.role !== 'system').map((message) => ({ role: message.role === 'assistant' ? 'assistant' : 'user', content: message.content }));
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+            model,
+            max_tokens: 8000,
+            ...(system.length > 0 ? { system } : {}),
+            messages: chatMessages,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`${providerName} API error (${response.status}): ${errorBody}`);
+    }
+
+    const data = (await response.json()) as {
+        content?: Array<{
+            type?: string;
+            text?: string;
+        }>;
+    };
+    return data.content?.[0]?.text ?? '';
+}
+
 export function parseCategoryResponse(content: string): IGenerateCategoryResponse {
     const parsed = parseJsonContent(content);
     const items = Array.isArray(parsed.items)

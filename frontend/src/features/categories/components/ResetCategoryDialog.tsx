@@ -57,7 +57,7 @@ export const ResetCategoryDialog: React.FC<IResetCategoryDialogProps> = ({ categ
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent showCloseButton={!loading}>
+            <DialogContent showCloseButton={!loading} onOpenAutoFocus={(event) => event.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <RotateCcw className="size-4" />

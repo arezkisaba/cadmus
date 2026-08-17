@@ -5,6 +5,7 @@ import { DatabaseService } from './features/_shared/services/DatabaseService';
 import { AiGenerationService } from './features/ai/services/AiGenerationService';
 import type { IAiGenerationService } from './features/ai/services/ports/IAiGenerationService';
 import { ChatGptAiProvider } from './features/ai/services/providers/ChatGptAiProvider';
+import { ClaudeAiProvider } from './features/ai/services/providers/ClaudeAiProvider';
 import { DeepSeekAiProvider } from './features/ai/services/providers/DeepSeekAiProvider';
 import { QwenAiProvider } from './features/ai/services/providers/QwenAiProvider';
 import { CategoriesService } from './features/categories/services/CategoriesService';
@@ -28,11 +29,13 @@ container.registerSingleton<ISettingsService>(DI_CONSTANTS.ISettingsService, Set
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IDeepSeekAiProvider, DeepSeekAiProvider);
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IQwenAiProvider, QwenAiProvider);
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IChatGptAiProvider, ChatGptAiProvider);
+container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IClaudeAiProvider, ClaudeAiProvider);
 container.register<IAiGenerationService[]>(DI_CONSTANTS.IAiProviders, {
     useFactory: (dependencyContainer) => [
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IDeepSeekAiProvider),
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IQwenAiProvider),
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IChatGptAiProvider),
+        dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IClaudeAiProvider),
     ],
 });
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IAiGenerationService, AiGenerationService);

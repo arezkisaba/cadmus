@@ -9,6 +9,7 @@ const SETTINGS: IAppSettings = {
     deepseekApiKey: 'sk-test',
     qwenApiKey: '',
     chatGptApiKey: '',
+    claudeApiKey: '',
     pixabayApiKey: '',
     pexelsApiKey: '',
     unsplashApiKey: '',

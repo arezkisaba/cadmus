@@ -17,6 +17,7 @@ export const SettingsPage: React.FC = () => {
     const [deepseekApiKey, setDeepseekApiKey] = useState(initial.deepseekApiKey);
     const [qwenApiKey, setQwenApiKey] = useState(initial.qwenApiKey);
     const [chatGptApiKey, setChatGptApiKey] = useState(initial.chatGptApiKey);
+    const [claudeApiKey, setClaudeApiKey] = useState(initial.claudeApiKey);
     const [pixabayApiKey, setPixabayApiKey] = useState(initial.pixabayApiKey);
     const [pexelsApiKey, setPexelsApiKey] = useState(initial.pexelsApiKey);
     const [unsplashApiKey, setUnsplashApiKey] = useState(initial.unsplashApiKey);
@@ -29,6 +30,7 @@ export const SettingsPage: React.FC = () => {
             deepseekApiKey,
             qwenApiKey,
             chatGptApiKey,
+            claudeApiKey,
             pixabayApiKey,
             pexelsApiKey,
             unsplashApiKey,
@@ -37,7 +39,7 @@ export const SettingsPage: React.FC = () => {
             useImages,
         });
         toast.success('Settings saved');
-    }, [settingsService, deepseekApiKey, qwenApiKey, chatGptApiKey, pixabayApiKey, pexelsApiKey, unsplashApiKey, sourceLang, targetLang, useImages]);
+    }, [settingsService, deepseekApiKey, qwenApiKey, chatGptApiKey, claudeApiKey, pixabayApiKey, pexelsApiKey, unsplashApiKey, sourceLang, targetLang, useImages]);
 
     return (
         <div className="mx-auto flex max-w-2xl flex-col gap-6">
@@ -53,7 +55,7 @@ export const SettingsPage: React.FC = () => {
                         AI providers
                     </CardTitle>
                     <CardDescription>
-                        Used to generate flashcards, in priority order: DeepSeek, Qwen, ChatGPT. Keys are stored locally.
+                        Used to generate flashcards, in priority order: DeepSeek, Qwen, ChatGPT, Claude. Keys are stored locally.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
@@ -91,6 +93,18 @@ export const SettingsPage: React.FC = () => {
                             autoComplete="off"
                         />
                         <p className="text-muted-foreground text-xs">Used when DeepSeek and Qwen have no key (model gpt-4o-mini).</p>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="claude-key">Claude API key</Label>
+                        <Input
+                            id="claude-key"
+                            type="password"
+                            value={claudeApiKey}
+                            onChange={(event) => setClaudeApiKey(event.target.value)}
+                            placeholder="sk-ant-..."
+                            autoComplete="off"
+                        />
+                        <p className="text-muted-foreground text-xs">Used when DeepSeek, Qwen and ChatGPT have no key (model claude-sonnet-4-5).</p>
                     </div>
                 </CardContent>
             </Card>

@@ -72,7 +72,7 @@ export const CreateCategoryDialog: React.FC<ICreateCategoryDialogProps> = ({ ope
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent showCloseButton={!loading}>
+            <DialogContent showCloseButton={!loading} onOpenAutoFocus={(event) => event.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Sparkles className="size-4" />
