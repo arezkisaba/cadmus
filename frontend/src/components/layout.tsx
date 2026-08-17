@@ -1,5 +1,5 @@
 import { Separator } from '@radix-ui/react-separator';
-import { FolderOpen, Languages, MessagesSquare, Settings, XCircle } from 'lucide-react';
+import { FolderOpen, Languages, MessagesSquare, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './theme-toggle';
 import {
@@ -25,11 +25,6 @@ const MENU_ITEMS = [
         title: 'Categories',
         icon: FolderOpen,
         path: '/',
-    },
-    {
-        title: 'Missed',
-        icon: XCircle,
-        path: '/mistakes',
     },
     {
         title: 'Chat',

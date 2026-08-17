@@ -7,8 +7,10 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DI_CONSTANTS } from '@/di-constants';
 import { useInjection } from '@/hooks/use-container';
+import { MissedCards } from '../../flashcards/components/MissedCards';
 import type { ICategoryStats, IFlashcardService } from '../../flashcards/services/ports/IFlashcardService';
 import { DEFAULT_CARD_COUNT } from '../card-count';
 import { CategoryCard } from '../components/CategoryCard';
@@ -85,7 +87,7 @@ export const CategoriesPage: React.FC = () => {
             <div className="flex items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-semibold tracking-tight">Categories</h2>
-                    <p className="text-muted-foreground text-sm">Flashcard decks generated from your prompts.</p>
+                    <p className="text-muted-foreground text-sm">My language flashcard decks.</p>
                 </div>
                 <Button onClick={() => setDialogOpen(true)}>
                     <Plus />
@@ -93,41 +95,52 @@ export const CategoriesPage: React.FC = () => {
                 </Button>
             </div>
 
-            {data === undefined ? (
-                renderSkeletons()
-            ) : data.categories.length === 0 ? (
-                <Card className="flex flex-col items-center justify-center gap-4 p-12 text-center">
-                    <div className="bg-primary/10 text-primary flex size-16 items-center justify-center rounded-full">
-                        <Sparkles className="size-8" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold">No categories yet</h3>
-                        <p className="text-muted-foreground mx-auto mt-1 max-w-sm text-sm">
-                            Describe a theme like "les vêtements de tous les jours" and AI will generate a vocabulary deck for you.
-                        </p>
-                    </div>
-                    <Button onClick={() => setDialogOpen(true)}>
-                        <Plus />
-                        Create your first category
-                    </Button>
-                </Card>
-            ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {data.categories.map((category) => {
-                        const stats = data.stats.get(category.id);
-                        return (
-                            <CategoryCard
-                                key={category.id}
-                                category={category}
-                                stats={stats}
-                                onReview={handleReview}
-                                onReset={handleReset}
-                                onDelete={handleDelete}
-                            />
-                        );
-                    })}
-                </div>
-            )}
+            <Tabs defaultValue="categories" className="w-full gap-6">
+                <TabsList>
+                    <TabsTrigger value="categories">Categories</TabsTrigger>
+                    <TabsTrigger value="missed">Missed</TabsTrigger>
+                </TabsList>
+                <TabsContent value="categories" className="flex flex-col gap-6">
+                    {data === undefined ? (
+                        renderSkeletons()
+                    ) : data.categories.length === 0 ? (
+                        <Card className="flex flex-col items-center justify-center gap-4 p-12 text-center">
+                            <div className="bg-primary/10 text-primary flex size-16 items-center justify-center rounded-full">
+                                <Sparkles className="size-8" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold">No categories yet</h3>
+                                <p className="text-muted-foreground mx-auto mt-1 max-w-sm text-sm">
+                                    Describe a theme like "les vêtements de tous les jours" and AI will generate a vocabulary deck for you.
+                                </p>
+                            </div>
+                            <Button onClick={() => setDialogOpen(true)}>
+                                <Plus />
+                                Create your first category
+                            </Button>
+                        </Card>
+                    ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {data.categories.map((category) => {
+                                const stats = data.stats.get(category.id);
+                                return (
+                                    <CategoryCard
+                                        key={category.id}
+                                        category={category}
+                                        stats={stats}
+                                        onReview={handleReview}
+                                        onReset={handleReset}
+                                        onDelete={handleDelete}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
+                </TabsContent>
+                <TabsContent value="missed" className="flex flex-col gap-6">
+                    <MissedCards />
+                </TabsContent>
+            </Tabs>
 
             <CreateCategoryDialog open={dialogOpen} onOpenChange={setDialogOpen} />
             <ResetCategoryDialog
