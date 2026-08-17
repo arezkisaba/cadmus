@@ -98,6 +98,7 @@ export const AppSidebar: React.FC = () => {
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const location = useLocation();
+    const isChat = location.pathname.startsWith('/chat');
 
     const getPageTitle = (): string => {
         if (location.pathname === '/settings') {
@@ -136,8 +137,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </div>
                     </div>
                 </header>
-                <main className="flex-1 min-h-0 w-full overflow-y-auto p-6">{children}</main>
-                <div style={{ height: 'env(safe-area-inset-bottom)' }} />
+                <main className={`flex-1 min-h-0 w-full overflow-y-auto p-6${isChat ? ' pb-0' : ''}`}>{children}</main>
+                {!isChat && <div style={{ height: 'env(safe-area-inset-bottom)' }} />}
             </SidebarInset>
         </SidebarProvider>
     );
