@@ -7,6 +7,7 @@ import type { IAiGenerationService } from './features/ai/services/ports/IAiGener
 import { ChatGptAiProvider } from './features/ai/services/providers/ChatGptAiProvider';
 import { ClaudeAiProvider } from './features/ai/services/providers/ClaudeAiProvider';
 import { DeepSeekAiProvider } from './features/ai/services/providers/DeepSeekAiProvider';
+import { MistralAiProvider } from './features/ai/services/providers/MistralAiProvider';
 import { QwenAiProvider } from './features/ai/services/providers/QwenAiProvider';
 import { CategoriesService } from './features/categories/services/CategoriesService';
 import type { ICategoriesService } from './features/categories/services/ports/ICategoriesService';
@@ -30,12 +31,14 @@ container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IDeepSeekAiProvid
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IQwenAiProvider, QwenAiProvider);
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IChatGptAiProvider, ChatGptAiProvider);
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IClaudeAiProvider, ClaudeAiProvider);
+container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IMistralAiProvider, MistralAiProvider);
 container.register<IAiGenerationService[]>(DI_CONSTANTS.IAiProviders, {
     useFactory: (dependencyContainer) => [
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IDeepSeekAiProvider),
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IQwenAiProvider),
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IChatGptAiProvider),
         dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IClaudeAiProvider),
+        dependencyContainer.resolve<IAiGenerationService>(DI_CONSTANTS.IMistralAiProvider),
     ],
 });
 container.registerSingleton<IAiGenerationService>(DI_CONSTANTS.IAiGenerationService, AiGenerationService);

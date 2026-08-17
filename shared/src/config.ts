@@ -9,6 +9,8 @@ export const CONFIG = {
     CHATGPT_MODEL: 'gpt-4o-mini',
     ANTHROPIC_API_URL: 'https://api.anthropic.com/v1/messages',
     ANTHROPIC_MODEL: 'claude-sonnet-4-5',
+    MISTRAL_API_URL: 'https://api.mistral.ai/v1/chat/completions',
+    MISTRAL_MODEL: 'mistral-large-latest',
     PIXABAY_API_URL: 'https://pixabay.com/api/',
     PEXELS_API_URL: 'https://api.pexels.com/v1/search',
     UNSPLASH_API_URL: 'https://api.unsplash.com/search/photos',

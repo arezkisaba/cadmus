@@ -156,7 +156,9 @@ export async function callAnthropic(url: string, model: string, apiKey: string, 
         .filter((message) => message.role === 'system')
         .map((message) => message.content)
         .join('\n');
-    const chatMessages = messages.filter((message) => message.role !== 'system').map((message) => ({ role: message.role === 'assistant' ? 'assistant' : 'user', content: message.content }));
+    const chatMessages = messages
+        .filter((message) => message.role !== 'system')
+        .map((message) => ({ role: message.role === 'assistant' ? 'assistant' : 'user', content: message.content }));
 
     const response = await fetch(url, {
         method: 'POST',

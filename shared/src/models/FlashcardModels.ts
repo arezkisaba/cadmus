@@ -41,6 +41,7 @@ export interface IAppSettings {
     qwenApiKey: string;
     chatGptApiKey: string;
     claudeApiKey: string;
+    mistralApiKey: string;
     pixabayApiKey: string;
     pexelsApiKey: string;
     unsplashApiKey: string;
