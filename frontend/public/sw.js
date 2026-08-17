@@ -1,16 +1,20 @@
-const CACHE_VERSION = 'cadmus-v4';
+const CACHE_VERSION = 'cadmus-v5';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const IMAGE_HOSTS = ['images.pixabay.com', 'api.openverse.org', 'upload.wikimedia.org', 'commons.wikimedia.org'];
+
+// Chemin de base déduit du scope du service worker ('/cadmus/' sur GitHub Pages, '/' en local)
+const BASE_PATH = new URL(self.registration.scope).pathname;
+
 const APP_SHELL = [
-    '/',
-    '/index.html',
-    '/manifest.webmanifest',
-    '/icons/favicon.svg',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png',
-    '/icons/icon-maskable-512.png',
-    '/icons/apple-touch-icon.png',
+    BASE_PATH,
+    `${BASE_PATH}index.html`,
+    `${BASE_PATH}manifest.webmanifest`,
+    `${BASE_PATH}icons/favicon.svg`,
+    `${BASE_PATH}icons/icon-192.png`,
+    `${BASE_PATH}icons/icon-512.png`,
+    `${BASE_PATH}icons/icon-maskable-512.png`,
+    `${BASE_PATH}icons/apple-touch-icon.png`,
 ];
 
 self.addEventListener('install', (event) => {
@@ -74,7 +78,7 @@ async function networkFirst(request) {
         if (cached) {
             return cached;
         }
-        const fallback = await caches.match('/index.html');
+        const fallback = await caches.match(`${BASE_PATH}index.html`);
         if (fallback) {
             return fallback;
         }

@@ -13,7 +13,7 @@ import { SongsPage } from './features/songs/pages/SongsPage';
 export const App: React.FC = () => {
     return (
         <ThemeProvider defaultTheme="dark">
-            <Router>
+            <Router basename={import.meta.env.BASE_URL.replace(/\/+$/, '')}>
                 <Layout>
                     <Routes>
                         <Route path="/" element={<CategoriesPage />} />

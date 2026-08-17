@@ -6,8 +6,9 @@ import './index.css';
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
+        const swUrl = `${import.meta.env.BASE_URL}sw.js`;
         navigator.serviceWorker
-            .register('/sw.js')
+            .register(swUrl)
             .then(() => {
                 // Première activation : recharge une fois pour que la page et tous
                 // ses assets (JS/CSS) passent par le service worker et soient mis en cache.
